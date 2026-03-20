@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- RhinoPy Complete Learning Package · Copyright (c) 2024 Dinesh Kumar Alagusundaram · MIT License -->
+<!-- Sources: Python Primer for Rhino (Tibbits/McNeel 2011), RhinoScript101 (Rutten/McNeel 2008) -->
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RhinoPy · API Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080b0f;--bg2:#0d1117;--bg3:#161b22;--bg4:#1e2633;
+  --border:#2a3240;--border2:#3d4f63;
+  --fg:#c9d1d9;--fg2:#8b949e;--fg3:#6272a4;
+  --accent:#00d9ff;--accent2:#ff6b35;--accent3:#a78bfa;
+  --accent4:#34d399;--accent5:#fbbf24;
+  --kw:#ff79c6;--st:#f1fa8c;--cm:#6272a4;--nm:#bd93f9;--fn:#50fa7b;--bi:#8be9fd;
+  --r:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;display:flex;min-height:100vh}
+
+/* ── SIDEBAR ── */
+#sidebar{
+  width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);
+  position:sticky;top:0;height:100vh;overflow-y:auto;padding:0;flex-shrink:0;
+}
+#sidebar::-webkit-scrollbar{width:4px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.sb-logo{padding:20px 16px 16px;border-bottom:1px solid var(--border)}
+.sb-logo a{text-decoration:none}
+.sb-logo .logo-top{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--accent);letter-spacing:-0.5px}
+.sb-logo .logo-sub{font-size:10px;color:var(--fg3);margin-top:2px}
+.sb-nav-home{display:block;padding:8px 16px;font-size:11px;color:var(--fg2);text-decoration:none;border-bottom:1px solid var(--border)}
+.sb-nav-home:hover{color:var(--accent)}
+.sb-section{padding:10px 16px 4px;font-size:9px;font-weight:700;color:var(--fg3);text-transform:uppercase;letter-spacing:1px}
+.sb-cat{display:block;padding:5px 16px;font-size:11px;color:var(--fg2);text-decoration:none;transition:.15s}
+.sb-cat:hover,.sb-cat.active{color:var(--accent);background:rgba(0,217,255,.06)}
+.sb-cat-badge{float:right;font-size:9px;color:var(--fg3);background:var(--bg3);padding:1px 5px;border-radius:8px}
+
+/* ── MAIN ── */
+main{flex:1;padding:40px 48px;max-width:960px}
+.page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:32px;color:#fff;letter-spacing:-1px;margin-bottom:6px}
+.page-sub{color:var(--fg2);font-size:12px;margin-bottom:36px}
+.page-sub a{color:var(--accent);text-decoration:none}
+
+/* ── CATEGORY SECTIONS ── */
+.cat-section{margin-bottom:60px}
+.cat-title{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:#fff;
+  border-bottom:2px solid var(--border);padding-bottom:10px;margin-bottom:24px;
+  display:flex;align-items:center;gap:12px;
+}
+.cat-badge{
+  font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;
+}
+.badge-app{background:rgba(0,217,255,.15);color:var(--accent);border:1px solid rgba(0,217,255,.3)}
+.badge-curve{background:rgba(255,107,53,.15);color:var(--accent2);border:1px solid rgba(255,107,53,.3)}
+.badge-surface{background:rgba(167,139,250,.15);color:var(--accent3);border:1px solid rgba(167,139,250,.3)}
+.badge-geom{background:rgba(52,211,153,.15);color:var(--accent4);border:1px solid rgba(52,211,153,.3)}
+.badge-object{background:rgba(251,191,36,.15);color:var(--accent5);border:1px solid rgba(251,191,36,.3)}
+.badge-ui{background:rgba(255,121,198,.15);color:var(--kw);border:1px solid rgba(255,121,198,.3)}
+.badge-util{background:rgba(98,114,164,.15);color:var(--cm);border:1px solid rgba(98,114,164,.3)}
+
+/* ── METHOD CARDS ── */
+.method{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:16px;overflow:hidden;transition:.2s}
+.method:hover{border-color:var(--border2)}
+.method-head{
+  padding:12px 18px;cursor:pointer;display:flex;align-items:center;gap:10px;
+  background:var(--bg3);border-bottom:1px solid var(--border);
+}
+.method-head:hover{background:var(--bg4)}
+.method-name{font-weight:700;font-size:14px;color:var(--fn);letter-spacing:0.3px}
+.method-sig{color:var(--fg2);font-size:12px;flex:1}
+.method-ret{font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(189,147,249,.12);color:var(--nm);border:1px solid rgba(189,147,249,.25);white-space:nowrap}
+.method-body{padding:18px;display:none}
+.method.open .method-body{display:block}
+.method-desc{color:var(--fg);font-size:12px;line-height:1.7;margin-bottom:14px}
+.params-title,.returns-title,.example-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--fg3);margin-bottom:8px}
+.param-row{display:grid;grid-template-columns:160px 80px 1fr;gap:8px;margin-bottom:6px;align-items:start}
+.param-name{color:var(--bi);font-weight:600}
+.param-type{color:var(--nm);font-size:11px}
+.param-desc{color:var(--fg2);font-size:11px}
+.returns-val{color:var(--accent4);font-size:12px;margin-bottom:12px}
+pre.example{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px;overflow-x:auto;font-size:12px;line-height:1.6}
+.kw{color:var(--kw)}.st{color:var(--st)}.cm{color:var(--cm)}.nm{color:var(--nm)}.fn{color:var(--fn)}.bi{color:var(--bi)}
+.tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(52,211,153,.1);color:var(--accent4);border:1px solid rgba(52,211,153,.2);margin-right:4px;margin-top:2px}
+.tag.opt{background:rgba(251,191,36,.08);color:var(--accent5);border-color:rgba(251,191,36,.2)}
+.see-also{margin-top:12px;font-size:11px;color:var(--fg3)}
+.see-also a{color:var(--accent);text-decoration:none}
+.see-also a:hover{text-decoration:underline}
+.expand-all{font-size:11px;color:var(--accent);cursor:pointer;background:none;border:1px solid rgba(0,217,255,.3);padding:4px 12px;border-radius:4px;margin-bottom:20px;float:right}
+.expand-all:hover{background:rgba(0,217,255,.08)}
+.search-bar{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 16px;color:var(--fg);font-family:'JetBrains Mono',monospace;font-size:13px;margin-bottom:28px;outline:none;transition:.2s}
+.search-bar:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,217,255,.1)}
+.search-bar::placeholder{color:var(--fg3)}
+footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);font-size:11px;color:var(--fg3);line-height:1.8}
+footer a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <div class="sb-logo">
+    <a href="index.html">
+      <div class="logo-top">RhinoPy</div>
+      <div class="logo-sub">API Reference · Offline</div>
+    </a>
+  </div>
+  <a href="index.html" class="sb-nav-home">← Back to Home</a>
+  <div class="sb-section">Categories</div>
+  <a href="#application" class="sb-cat">Application<span class="sb-cat-badge">47</span></a>
+  <a href="#curve" class="sb-cat">Curve<span class="sb-cat-badge">60+</span></a>
+  <a href="#surface" class="sb-cat">Surface<span class="sb-cat-badge">55+</span></a>
+  <a href="#geometry" class="sb-cat">Geometry<span class="sb-cat-badge">30+</span></a>
+  <a href="#object" class="sb-cat">Object<span class="sb-cat-badge">45+</span></a>
+  <a href="#pointvector" class="sb-cat">Point/Vector<span class="sb-cat-badge">30+</span></a>
+  <a href="#mesh" class="sb-cat">Mesh<span class="sb-cat-badge">40+</span></a>
+  <a href="#layer" class="sb-cat">Layer<span class="sb-cat-badge">20+</span></a>
+  <a href="#selection" class="sb-cat">Selection<span class="sb-cat-badge">20+</span></a>
+  <a href="#userinterface" class="sb-cat">User Interface<span class="sb-cat-badge">25+</span></a>
+  <a href="#utility" class="sb-cat">Utility<span class="sb-cat-badge">15+</span></a>
+  <a href="#transformation" class="sb-cat">Transformation<span class="sb-cat-badge">20+</span></a>
+  <a href="#view" class="sb-cat">View<span class="sb-cat-badge">30+</span></a>
+  <a href="#document" class="sb-cat">Document<span class="sb-cat-badge">20+</span></a>
+  <a href="#block" class="sb-cat">Block<span class="sb-cat-badge">15+</span></a>
+  <a href="#group" class="sb-cat">Group<span class="sb-cat-badge">10+</span></a>
+  <a href="#linetype" class="sb-cat">Linetype<span class="sb-cat-badge">8</span></a>
+  <a href="#material" class="sb-cat">Material<span class="sb-cat-badge">15+</span></a>
+  <a href="#hatch" class="sb-cat">Hatch<span class="sb-cat-badge">10+</span></a>
+  <a href="#light" class="sb-cat">Light<span class="sb-cat-badge">15+</span></a>
+  <div class="sb-section">Quick Nav</div>
+  <a href="learn.html" class="sb-cat">📖 Learn</a>
+  <a href="cheatsheet.html" class="sb-cat">📄 Cheatsheet</a>
+</nav>
+
+<main>
+  <div class="page-title">API Reference</div>
+  <div class="page-sub">RhinoScriptSyntax · Full offline reference · Source: <a href="https://developer.rhino3d.com/api/RhinoScriptSyntax/" target="_blank">developer.rhino3d.com</a></div>
+
+  <input class="search-bar" type="text" id="searchBox" placeholder="🔍  Search methods, e.g. AddCurve, GetObject, SurfaceNormal…" oninput="filterMethods(this.value)">
+
+  <!-- ────────────── APPLICATION ────────────── -->
+  <section class="cat-section" id="application">
+    <div class="cat-title"><span>Application</span><span class="cat-badge badge-app">app</span>
+      <button class="expand-all" onclick="toggleSection('application')">Expand All</button>
+    </div>
+
+    <!-- AddAlias -->
+    <div class="method" data-name="addalias">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddAlias</span>
+        <span class="method-sig">(alias, macro)</span>
+        <span class="method-ret">→ bool</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Add new command alias to Rhino. Command aliases can be added manually via Rhino's Options → Aliases tab.</div>
+        <div class="params-title">Parameters</div>
+        <div class="param-row"><span class="param-name">alias</span><span class="param-type">str</span><span class="param-desc">Name of new command alias. Cannot match command names or existing aliases.</span></div>
+        <div class="param-row"><span class="param-name">macro</span><span class="param-type">str</span><span class="param-desc">The macro to run when the alias is executed.</span></div>
+        <div class="returns-title">Returns</div>
+        <div class="returns-val">bool — True/False indicating success</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+rs.<span class="fn">AddAlias</span>(<span class="st">"OriginLine"</span>, <span class="st">"!_Line 0,0,0"</span>)</pre>
+      </div>
+    </div>
+
+    <!-- Command -->
+    <div class="method" data-name="command">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">Command</span>
+        <span class="method-sig">(commandString, echo=True)</span>
+        <span class="method-ret">→ bool</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Runs a Rhino command script. All Rhino commands can be used. Run one command per call — never combine multiple commands in a single call.</div>
+        <div class="params-title">Parameters</div>
+        <div class="param-row"><span class="param-name">commandString</span><span class="param-type">str</span><span class="param-desc">A Rhino command including any arguments</span></div>
+        <div class="param-row"><span class="param-name">echo</span><span class="param-type">bool</span><span class="param-desc">If True, displays command on commandline <span class="tag opt">optional</span></span></div>
+        <div class="returns-title">Returns</div>
+        <div class="returns-val">bool — True if command executed successfully</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+<span class="cm"># CORRECT: one command per call</span>
+rs.<span class="fn">Command</span>(<span class="st">"_Line 0,0,0 5,5,0"</span>)
+rs.<span class="fn">Command</span>(<span class="st">"_SelLast"</span>)
+
+<span class="cm"># WRONG: do not combine commands</span>
+<span class="cm"># rs.Command("_Line _SelLast _Invert")  ← NEVER do this</span></pre>
+      </div>
+    </div>
+
+    <!-- EnableRedraw -->
+    <div class="method" data-name="enableredraw">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">EnableRedraw</span>
+        <span class="method-sig">(enable=True)</span>
+        <span class="method-ret">→ bool</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Enables/disables screen redrawing. Disable before loops that add many objects — huge performance gain. Always re-enable afterwards.</div>
+        <div class="params-title">Parameters</div>
+        <div class="param-row"><span class="param-name">enable</span><span class="param-type">bool</span><span class="param-desc">True to enable, False to disable redraw <span class="tag opt">optional</span></span></div>
+        <div class="returns-title">Returns</div>
+        <div class="returns-val">bool — previous state</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+rs.<span class="fn">EnableRedraw</span>(<span class="kw">False</span>)         <span class="cm"># disable for speed</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nm">1000</span>):
+    rs.<span class="fn">AddPoint</span>([i, <span class="nm">0</span>, <span class="nm">0</span>])
+rs.<span class="fn">EnableRedraw</span>(<span class="kw">True</span>)          <span class="cm"># always re-enable</span></pre>
+      </div>
+    </div>
+
+    <!-- Ortho / Osnap / Planar / Snap -->
+    <div class="method" data-name="ortho osnap planar snap">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">Ortho / Osnap / Planar</span>
+        <span class="method-sig">(enable=None)</span>
+        <span class="method-ret">→ bool</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Toggle Rhino modeling aids. Returns current state if enable omitted, otherwise sets state and returns previous.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+<span class="kw">if not</span> rs.<span class="fn">Ortho</span>(): rs.<span class="fn">Ortho</span>(<span class="kw">True</span>)
+<span class="kw">if not</span> rs.<span class="fn">Osnap</span>(): rs.<span class="fn">Osnap</span>(<span class="kw">True</span>)
+<span class="kw">if not</span> rs.<span class="fn">Planar</span>(): rs.<span class="fn">Planar</span>(<span class="kw">True</span>)</pre>
+      </div>
+    </div>
+
+    <!-- OsnapMode -->
+    <div class="method" data-name="osnapmode">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">OsnapMode</span>
+        <span class="method-sig">(mode=None)</span>
+        <span class="method-ret">→ number</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Returns or sets the object snap mode bitmask. Combine modes by adding values.</div>
+        <div class="params-title">Mode Values</div>
+        <div class="param-row"><span class="param-name">0</span><span class="param-type">None</span><span class="param-desc">No snapping</span></div>
+        <div class="param-row"><span class="param-name">2</span><span class="param-type">Near</span><span class="param-desc">Near snap</span></div>
+        <div class="param-row"><span class="param-name">32</span><span class="param-type">Center</span><span class="param-desc">Center snap</span></div>
+        <div class="param-row"><span class="param-name">2048</span><span class="param-type">Midpoint</span><span class="param-desc">Midpoint snap</span></div>
+        <div class="param-row"><span class="param-name">8192</span><span class="param-type">Intersection</span><span class="param-desc">Intersection snap</span></div>
+        <div class="param-row"><span class="param-name">131072</span><span class="param-type">End</span><span class="param-desc">Endpoint snap</span></div>
+        <div class="param-row"><span class="param-name">2097152</span><span class="param-type">Tangent</span><span class="param-desc">Tangent snap</span></div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+<span class="cm"># Enable only End snap</span>
+rs.<span class="fn">OsnapMode</span>(<span class="nm">131072</span>)
+<span class="cm"># Add End to current modes</span>
+mode <span class="op">=</span> rs.<span class="fn">OsnapMode</span>()
+rs.<span class="fn">OsnapMode</span>(mode + <span class="nm">131072</span>)</pre>
+      </div>
+    </div>
+
+    <!-- ExeVersion / ExePlatform / BuildDate -->
+    <div class="method" data-name="exeversion exeplatform builddate sdkversion">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">ExeVersion / ExePlatform / BuildDate</span>
+        <span class="method-sig">()</span>
+        <span class="method-ret">→ str / date</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Query Rhino executable and SDK info.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+<span class="bi">print</span>(<span class="st">"Rhino Version:"</span>,  rs.<span class="fn">ExeVersion</span>())
+<span class="bi">print</span>(<span class="st">"Platform:"</span>,       rs.<span class="fn">ExePlatform</span>())   <span class="cm"># 1 = 64-bit</span>
+<span class="bi">print</span>(<span class="st">"Build Date:"</span>,     rs.<span class="fn">BuildDate</span>())
+<span class="bi">print</span>(<span class="st">"SDK Version:"</span>,    rs.<span class="fn">SdkVersion</span>())
+<span class="bi">print</span>(<span class="st">"Install Folder:"</span>, rs.<span class="fn">InstallFolder</span>())</pre>
+      </div>
+    </div>
+
+    <!-- Prompt / CommandHistory -->
+    <div class="method" data-name="prompt commandhistory clearconsole">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">Prompt / CommandHistory</span>
+        <span class="method-sig">(message=None) / ()</span>
+        <span class="method-ret">→ none / str</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Set command prompt text or retrieve command history log.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+rs.<span class="fn">Prompt</span>(<span class="st">"Select a curve to measure"</span>)
+history <span class="op">=</span> rs.<span class="fn">CommandHistory</span>()
+<span class="bi">print</span>(history[-<span class="nm">200</span>:])   <span class="cm"># last 200 chars</span></pre>
+      </div>
+    </div>
+
+    <!-- Sleep -->
+    <div class="method" data-name="sleep">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">Sleep</span>
+        <span class="method-sig">(milliseconds)</span>
+        <span class="method-ret">→ none</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Suspends execution for specified milliseconds. Use for animations or waiting for Rhino to catch up.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nm">10</span>):
+    rs.<span class="fn">AddPoint</span>([i, <span class="nm">0</span>, <span class="nm">0</span>])
+    rs.<span class="fn">Sleep</span>(<span class="nm">100</span>)   <span class="cm"># pause 0.1s between each point</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── CURVE ────────────── -->
+  <section class="cat-section" id="curve">
+    <div class="cat-title"><span>Curve</span><span class="cat-badge badge-curve">curve</span>
+      <button class="expand-all" onclick="toggleSection('curve')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="addline">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddLine</span>
+        <span class="method-sig">(start, end)</span>
+        <span class="method-ret">→ guid</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Creates a line from two 3D points. Returns the identifier (GUID) of the new object, or None on failure.</div>
+        <div class="params-title">Parameters</div>
+        <div class="param-row"><span class="param-name">start</span><span class="param-type">point</span><span class="param-desc">3D start point [x, y, z]</span></div>
+        <div class="param-row"><span class="param-name">end</span><span class="param-type">point</span><span class="param-desc">3D end point [x, y, z]</span></div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+line_id <span class="op">=</span> rs.<span class="fn">AddLine</span>([<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>], [<span class="nm">10</span>,<span class="nm">5</span>,<span class="nm">0</span>])
+length  <span class="op">=</span> rs.<span class="fn">CurveLength</span>(line_id)
+<span class="bi">print</span>(<span class="st">"Length:"</span>, length)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="addpolyline">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddPolyline</span>
+        <span class="method-sig">(points)</span>
+        <span class="method-ret">→ guid</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Creates a polyline curve from a list of points. Minimum 2 points.</div>
+        <div class="params-title">Parameters</div>
+        <div class="param-row"><span class="param-name">points</span><span class="param-type">list</span><span class="param-desc">List of 3D points [[x,y,z], ...]</span></div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+pts <span class="op">=</span> [[<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>],[<span class="nm">5</span>,<span class="nm">0</span>,<span class="nm">0</span>],[<span class="nm">5</span>,<span class="nm">5</span>,<span class="nm">0</span>],[<span class="nm">0</span>,<span class="nm">5</span>,<span class="nm">0</span>],[<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>]]
+poly_id <span class="op">=</span> rs.<span class="fn">AddPolyline</span>(pts)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="addcurve addinterpcurve addnurbscurve">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddCurve / AddInterpCurve / AddNurbsCurve</span>
+        <span class="method-sig">(points, degree=3)</span>
+        <span class="method-ret">→ guid</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc"><strong>AddCurve</strong> — control-point curve through or near points.<br>
+        <strong>AddInterpCurve</strong> — interpolated (passes through all points).<br>
+        <strong>AddNurbsCurve</strong> — full NURBS with optional knots and weights.</div>
+        <div class="params-title">Parameters</div>
+        <div class="param-row"><span class="param-name">points</span><span class="param-type">list</span><span class="param-desc">List of 3D control/interpolation points</span></div>
+        <div class="param-row"><span class="param-name">degree</span><span class="param-type">int</span><span class="param-desc">Curve degree. 1=polyline, 3=cubic, 5=quintic <span class="tag opt">optional</span></span></div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+<span class="kw">import</span> math
+
+pts <span class="op">=</span> [[i, math.<span class="fn">sin</span>(i), <span class="nm">0</span>] <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nm">20</span>)]
+crv1 <span class="op">=</span> rs.<span class="fn">AddCurve</span>(pts, <span class="nm">3</span>)        <span class="cm"># smooth cubic</span>
+crv2 <span class="op">=</span> rs.<span class="fn">AddInterpCurve</span>(pts, <span class="nm">3</span>)  <span class="cm"># interpolated</span>
+crv3 <span class="op">=</span> rs.<span class="fn">AddCurve</span>(pts, <span class="nm">5</span>)        <span class="cm"># degree-5</span></pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="addarc addcircle addellipse">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddArc / AddCircle / AddEllipse</span>
+        <span class="method-sig">various parameters</span>
+        <span class="method-ret">→ guid</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Primitive conic curve constructors.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+<span class="kw">import</span> math
+
+<span class="cm"># Circle at origin, radius 5</span>
+circle <span class="op">=</span> rs.<span class="fn">AddCircle</span>([<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>], <span class="nm">5</span>)
+
+<span class="cm"># Arc: plane, radius, start angle, end angle (degrees)</span>
+plane <span class="op">=</span> rs.<span class="fn">WorldXYPlane</span>()
+arc   <span class="op">=</span> rs.<span class="fn">AddArc</span>(plane, <span class="nm">3</span>, <span class="nm">90</span>)   <span class="cm"># 90-degree arc</span>
+
+<span class="cm"># Ellipse: plane, radiusX, radiusY</span>
+ellipse <span class="op">=</span> rs.<span class="fn">AddEllipse</span>(plane, <span class="nm">5</span>, <span class="nm">3</span>)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="curvelength">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">CurveLength</span>
+        <span class="method-sig">(curve_id, segment_index=-1, sub_domain=None)</span>
+        <span class="method-ret">→ float</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Returns the length of a curve object. Optionally specify a parameter sub-domain to get partial length.</div>
+        <div class="params-title">Parameters</div>
+        <div class="param-row"><span class="param-name">curve_id</span><span class="param-type">guid</span><span class="param-desc">Identifier of the curve</span></div>
+        <div class="param-row"><span class="param-name">sub_domain</span><span class="param-type">[t0,t1]</span><span class="param-desc">Curve parameter interval for partial length <span class="tag opt">optional</span></span></div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+crv <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Select a curve"</span>, rs.filter.<span class="fn">curve</span>)
+<span class="kw">if</span> crv:
+    length <span class="op">=</span> rs.<span class="fn">CurveLength</span>(crv)
+    domain <span class="op">=</span> rs.<span class="fn">CurveDomain</span>(crv)
+    half   <span class="op">=</span> rs.<span class="fn">CurveLength</span>(crv, sub_domain<span class="op">=</span>[domain[<span class="nm">0</span>], (domain[<span class="nm">0</span>]+domain[<span class="nm">1</span>])/<span class="nm">2</span>])
+    <span class="bi">print</span>(<span class="st">f"Total: </span>{length:.2f}<span class="st">, Half: </span>{half:.2f}<span class="st">"</span>)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="curvedomain curveendpoint curvestartpoint curvetangent">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">CurveDomain / CurveEndPoint / CurveStartPoint / CurveTangent</span>
+        <span class="method-sig">(curve_id, ...)</span>
+        <span class="method-ret">→ various</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Query curve geometry properties.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+crv <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Curve"</span>, rs.filter.curve)
+domain <span class="op">=</span> rs.<span class="fn">CurveDomain</span>(crv)      <span class="cm"># [t_start, t_end]</span>
+start  <span class="op">=</span> rs.<span class="fn">CurveStartPoint</span>(crv)   <span class="cm"># 3D point</span>
+end    <span class="op">=</span> rs.<span class="fn">CurveEndPoint</span>(crv)     <span class="cm"># 3D point</span>
+tmid   <span class="op">=</span> (domain[<span class="nm">0</span>] <span class="op">+</span> domain[<span class="nm">1</span>]) / <span class="nm">2</span>
+tang   <span class="op">=</span> rs.<span class="fn">CurveTangent</span>(crv, tmid) <span class="cm"># tangent vector at midpoint</span></pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="dividecurve dividecurvelength">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">DivideCurve / DivideCurveLength</span>
+        <span class="method-sig">(curve_id, segments) / (curve_id, length)</span>
+        <span class="method-ret">→ list of points</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc"><strong>DivideCurve</strong> — divide into N equal segments by parameter.<br>
+        <strong>DivideCurveLength</strong> — divide by arc length (more evenly spaced in 3D).</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+crv <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Curve"</span>, rs.filter.curve)
+pts <span class="op">=</span> rs.<span class="fn">DivideCurve</span>(crv, <span class="nm">20</span>)         <span class="cm"># 20 segments, 21 points</span>
+pts_eq <span class="op">=</span> rs.<span class="fn">DivideCurveLength</span>(crv, <span class="nm">1.0</span>) <span class="cm"># every 1 unit of length</span>
+<span class="kw">for</span> pt <span class="kw">in</span> pts: rs.<span class="fn">AddPoint</span>(pt)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="evaluatecurve">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">EvaluateCurve</span>
+        <span class="method-sig">(curve_id, t)</span>
+        <span class="method-ret">→ point3d</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Evaluates a curve at a parameter value, returning the 3D world coordinate.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+crv    <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Curve"</span>, rs.filter.curve)
+domain <span class="op">=</span> rs.<span class="fn">CurveDomain</span>(crv)
+tmid   <span class="op">=</span> (domain[<span class="nm">0</span>] <span class="op">+</span> domain[<span class="nm">1</span>]) / <span class="nm">2</span>
+midpt  <span class="op">=</span> rs.<span class="fn">EvaluateCurve</span>(crv, tmid)
+rs.<span class="fn">AddPoint</span>(midpt)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="curvepoints curvedegree curveknots curveweights">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">CurvePoints / CurveDegree / CurveKnots / CurveWeights</span>
+        <span class="method-sig">(curve_id)</span>
+        <span class="method-ret">→ various</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Access NURBS curve data: control points, degree, knot vector, weights.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+crv     <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"NURBS Curve"</span>, rs.filter.curve)
+degree  <span class="op">=</span> rs.<span class="fn">CurveDegree</span>(crv)     <span class="cm"># e.g. 3</span>
+pts     <span class="op">=</span> rs.<span class="fn">CurvePoints</span>(crv)     <span class="cm"># control points</span>
+knots   <span class="op">=</span> rs.<span class="fn">CurveKnots</span>(crv)      <span class="cm"># knot vector list</span>
+weights <span class="op">=</span> rs.<span class="fn">CurveWeights</span>(crv)    <span class="cm"># weight per control pt</span>
+<span class="bi">print</span>(<span class="st">f"Degree {degree}, {</span><span class="bi">len</span>(pts)<span class="st">} control points"</span>)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="iscurveclosed iscurve">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">IsCurve / IsCurveClosed</span>
+        <span class="method-sig">(object_id)</span>
+        <span class="method-ret">→ bool</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Test if an object is a curve, and whether that curve is closed (start=end).</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+obj <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Select object"</span>)
+<span class="kw">if</span> rs.<span class="fn">IsCurve</span>(obj):
+    closed <span class="op">=</span> rs.<span class="fn">IsCurveClosed</span>(obj)
+    <span class="bi">print</span>(<span class="st">"Closed:"</span>, closed)</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── SURFACE ────────────── -->
+  <section class="cat-section" id="surface">
+    <div class="cat-title"><span>Surface</span><span class="cat-badge badge-surface">surface</span>
+      <button class="expand-all" onclick="toggleSection('surface')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="addplanesurface addsphere addloftsrf addnurbssurface">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddPlaneSurface / AddSphere / AddLoftSrf</span>
+        <span class="method-sig">various</span>
+        <span class="method-ret">→ guid</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Create primitive and lofted surfaces.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+<span class="cm"># Flat planar surface: plane, [width, height]</span>
+plane <span class="op">=</span> rs.<span class="fn">WorldXYPlane</span>()
+srf1  <span class="op">=</span> rs.<span class="fn">AddPlaneSurface</span>(plane, [<span class="nm">10</span>,<span class="nm">10</span>], [<span class="nm">10</span>,<span class="nm">10</span>])
+
+<span class="cm"># Sphere: center, radius</span>
+srf2  <span class="op">=</span> rs.<span class="fn">AddSphere</span>([<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>], <span class="nm">5</span>)
+
+<span class="cm"># Loft through list of curves</span>
+crv1  <span class="op">=</span> rs.<span class="fn">AddCircle</span>(rs.<span class="fn">PlaneFromNormal</span>([<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>],[<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">1</span>]), <span class="nm">3</span>)
+crv2  <span class="op">=</span> rs.<span class="fn">AddCircle</span>(rs.<span class="fn">PlaneFromNormal</span>([<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">5</span>],[<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">1</span>]), <span class="nm">5</span>)
+loft  <span class="op">=</span> rs.<span class="fn">AddLoftSrf</span>([crv1, crv2])</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="surfacedomain evaluatesurface surfaceframe surfaceclosestpoint">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">SurfaceDomain / EvaluateSurface / SurfaceFrame</span>
+        <span class="method-sig">(srf_id, direction/uv_pt)</span>
+        <span class="method-ret">→ various</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Core surface evaluation. <strong>SurfaceDomain</strong> gives the UV parameter range. <strong>EvaluateSurface</strong> returns 3D point at [u,v]. <strong>SurfaceFrame</strong> returns the full moving frame (origin, tangents, normal).</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+srf <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Surface"</span>, rs.filter.surface)
+
+udom <span class="op">=</span> rs.<span class="fn">SurfaceDomain</span>(srf, <span class="nm">0</span>)   <span class="cm"># U direction [min, max]</span>
+vdom <span class="op">=</span> rs.<span class="fn">SurfaceDomain</span>(srf, <span class="nm">1</span>)   <span class="cm"># V direction [min, max]</span>
+
+<span class="cm"># Evaluate at UV parameter</span>
+u <span class="op">=</span> (udom[<span class="nm">0</span>] <span class="op">+</span> udom[<span class="nm">1</span>]) / <span class="nm">2</span>
+v <span class="op">=</span> (vdom[<span class="nm">0</span>] <span class="op">+</span> vdom[<span class="nm">1</span>]) / <span class="nm">2</span>
+pt     <span class="op">=</span> rs.<span class="fn">EvaluateSurface</span>(srf, u, v)
+frame  <span class="op">=</span> rs.<span class="fn">SurfaceFrame</span>(srf, [u, v])  <span class="cm"># plane at (u,v)</span>
+normal <span class="op">=</span> rs.<span class="fn">SurfaceNormal</span>(srf, [u, v]) <span class="cm"># normal vector</span>
+rs.<span class="fn">AddPoint</span>(pt)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="surfaceclosestpoint">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">SurfaceClosestPoint</span>
+        <span class="method-sig">(surface_id, test_point)</span>
+        <span class="method-ret">→ [u, v]</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Returns the UV parameters of the closest point on a surface to a given 3D test point.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+srf <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Surface"</span>, rs.filter.surface)
+pt  <span class="op">=</span> rs.<span class="fn">GetPoint</span>(<span class="st">"Pick a point"</span>)
+uv  <span class="op">=</span> rs.<span class="fn">SurfaceClosestPoint</span>(srf, pt)   <span class="cm"># [u, v]</span>
+closest <span class="op">=</span> rs.<span class="fn">EvaluateSurface</span>(srf, uv[<span class="nm">0</span>], uv[<span class="nm">1</span>])
+rs.<span class="fn">AddLine</span>(pt, closest)                <span class="cm"># visualise distance</span></pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="surfacepoints surfacepointcount surfaceknotsurface">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">SurfacePoints / SurfacePointCount / SurfaceKnots</span>
+        <span class="method-sig">(surface_id)</span>
+        <span class="method-ret">→ various</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Access NURBS surface data: control point grid, counts (U×V), knot vectors.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+srf   <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"NURBS Surface"</span>, rs.filter.surface)
+count <span class="op">=</span> rs.<span class="fn">SurfacePointCount</span>(srf)   <span class="cm"># [Nu, Nv]</span>
+pts   <span class="op">=</span> rs.<span class="fn">SurfacePoints</span>(srf)       <span class="cm"># list of control points</span>
+<span class="bi">print</span>(<span class="st">f"Grid: {count[0]} x {count[1]} = {</span><span class="bi">len</span>(pts)<span class="st">} points"</span>)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="addinterpcrvonesrf extractisocurve">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddInterpCrvOnSrf / ExtractIsoCurve</span>
+        <span class="method-sig">various</span>
+        <span class="method-ret">→ guid</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc"><strong>AddInterpCrvOnSrf</strong> — interpolated curve on a surface (geodesic-like).<br>
+        <strong>ExtractIsoCurve</strong> — extract an isocurve at a parameter value.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+srf  <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Surface"</span>, rs.filter.surface)
+udom <span class="op">=</span> rs.<span class="fn">SurfaceDomain</span>(srf, <span class="nm">0</span>)
+
+<span class="cm"># Extract U isocurve at midpoint</span>
+umid <span class="op">=</span> (udom[<span class="nm">0</span>] <span class="op">+</span> udom[<span class="nm">1</span>]) / <span class="nm">2</span>
+iso  <span class="op">=</span> rs.<span class="fn">ExtractIsoCurve</span>(srf, umid, <span class="nm">0</span>)  <span class="cm"># 0=U, 1=V</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── GEOMETRY ────────────── -->
+  <section class="cat-section" id="geometry">
+    <div class="cat-title"><span>Geometry</span><span class="cat-badge badge-geom">geometry</span>
+      <button class="expand-all" onclick="toggleSection('geometry')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="distance angle">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">Distance / Angle</span>
+        <span class="method-sig">(pt1, pt2) / (pt1, pt2, pt3)</span>
+        <span class="method-ret">→ float</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc"><strong>Distance</strong> — 3D Euclidean distance between two points.<br>
+        <strong>Angle</strong> — angle in degrees between two vectors or at a point.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+p1 <span class="op">=</span> [<span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>]
+p2 <span class="op">=</span> [<span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">0</span>]
+d  <span class="op">=</span> rs.<span class="fn">Distance</span>(p1, p2)        <span class="cm"># → 5.0</span>
+p3 <span class="op">=</span> [<span class="nm">3</span>, <span class="nm">0</span>, <span class="nm">0</span>]
+ang<span class="op">=</span> rs.<span class="fn">Angle</span>(p1, p2, p3)       <span class="cm"># angle at p1 between p2 and p3</span></pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="brepclosepoint">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">BrepClosestPoint</span>
+        <span class="method-sig">(object_id, point)</span>
+        <span class="method-ret">→ [pt, normal, face_uv, …]</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Returns the closest point on a Brep (solid/surface) to a test point. Returns a tuple: [closest_point, normal, face_uv, component_type, component_index].</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+brep <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Brep"</span>, rs.filter.surface)
+pt   <span class="op">=</span> rs.<span class="fn">GetPoint</span>(<span class="st">"Test point"</span>)
+result <span class="op">=</span> rs.<span class="fn">BrepClosestPoint</span>(brep, pt)
+closest, normal <span class="op">=</span> result[<span class="nm">0</span>], result[<span class="nm">1</span>]
+rs.<span class="fn">AddLine</span>(pt, closest)
+rs.<span class="fn">AddLine</span>(closest, rs.<span class="fn">VectorAdd</span>(closest, rs.<span class="fn">VectorScale</span>(normal,<span class="nm">1</span>)))</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── OBJECT ────────────── -->
+  <section class="cat-section" id="object">
+    <div class="cat-title"><span>Object</span><span class="cat-badge badge-object">object</span>
+      <button class="expand-all" onclick="toggleSection('object')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="deleteobject deleteobjects">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">DeleteObject / DeleteObjects</span>
+        <span class="method-sig">(object_id) / (object_ids)</span>
+        <span class="method-ret">→ bool / int</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Delete one or more objects from the document.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+tmp_pts <span class="op">=</span> []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nm">5</span>):
+    tmp_pts.<span class="fn">append</span>(rs.<span class="fn">AddPoint</span>([i, <span class="nm">0</span>, <span class="nm">0</span>]))
+<span class="cm"># … do work …</span>
+rs.<span class="fn">DeleteObjects</span>(tmp_pts)   <span class="cm"># clean up all at once</span></pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="objectname objectcolor objectlayer">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">ObjectName / ObjectColor / ObjectLayer</span>
+        <span class="method-sig">(object_id, value=None)</span>
+        <span class="method-ret">→ str / color</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Get or set object attributes. If value omitted, returns current. If value given, sets and returns previous.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+obj <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Object"</span>)
+rs.<span class="fn">ObjectName</span>(obj, <span class="st">"MyBeam"</span>)
+rs.<span class="fn">ObjectColor</span>(obj, (<span class="nm">255</span>, <span class="nm">0</span>, <span class="nm">0</span>))   <span class="cm"># red</span>
+rs.<span class="fn">ObjectLayer</span>(obj, <span class="st">"Structure"</span>)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="scaleobject moveobject rotateobject">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">ScaleObject / MoveObject / RotateObject</span>
+        <span class="method-sig">various</span>
+        <span class="method-ret">→ guid</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Transform objects. These create new objects or modify in place depending on copy flag.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+obj <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Object"</span>)
+<span class="cm"># Scale: origin, [sx, sy, sz], copy=False</span>
+rs.<span class="fn">ScaleObject</span>(obj, [<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>], [<span class="nm">2</span>,<span class="nm">2</span>,<span class="nm">2</span>])
+
+<span class="cm"># Move: translation vector</span>
+rs.<span class="fn">MoveObject</span>(obj, [<span class="nm">10</span>,<span class="nm">0</span>,<span class="nm">0</span>])
+
+<span class="cm"># Rotate around Z axis 45°</span>
+rs.<span class="fn">RotateObject</span>(obj, [<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>], <span class="nm">45</span>, [<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">1</span>])</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="objectsbytype">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">ObjectsByType</span>
+        <span class="method-sig">(geometry_type, select=False, state=0)</span>
+        <span class="method-ret">→ list of guid</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Returns all objects of a given geometry type. Type filter values match rs.filter constants.</div>
+        <div class="params-title">Common filter values</div>
+        <div class="param-row"><span class="param-name">rs.filter.point</span><span class="param-type">1</span><span class="param-desc">Point objects</span></div>
+        <div class="param-row"><span class="param-name">rs.filter.curve</span><span class="param-type">4</span><span class="param-desc">Curves</span></div>
+        <div class="param-row"><span class="param-name">rs.filter.surface</span><span class="param-type">8</span><span class="param-desc">Surfaces / Breps</span></div>
+        <div class="param-row"><span class="param-name">rs.filter.mesh</span><span class="param-type">32</span><span class="param-desc">Mesh objects</span></div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+curves <span class="op">=</span> rs.<span class="fn">ObjectsByType</span>(rs.filter.curve)
+<span class="bi">print</span>(<span class="st">f"Found {</span><span class="bi">len</span>(curves)<span class="st">} curves"</span>)
+<span class="kw">for</span> c <span class="kw">in</span> curves:
+    <span class="bi">print</span>(rs.<span class="fn">CurveLength</span>(c))</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── POINT / VECTOR ────────────── -->
+  <section class="cat-section" id="pointvector">
+    <div class="cat-title"><span>Point / Vector</span><span class="cat-badge badge-geom">math</span>
+      <button class="expand-all" onclick="toggleSection('pointvector')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="addpoint">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddPoint / AddPoints</span>
+        <span class="method-sig">(point) / (points)</span>
+        <span class="method-ret">→ guid / list</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Adds a 3D point object (visible dot) to the document.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+<span class="kw">import</span> math
+pts <span class="op">=</span> [[i, math.<span class="fn">sin</span>(i * <span class="nm">0.5</span>), <span class="nm">0</span>] <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nm">30</span>)]
+rs.<span class="fn">AddPoints</span>(pts)   <span class="cm"># batch add — faster</span></pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="vectoradd vectorsubtract vectorscale vectorunitize vectorlength vectorcrossproduct vectordotproduct">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">Vector Math Functions</span>
+        <span class="method-sig">VectorAdd / VectorSubtract / VectorScale / VectorUnitize / VectorLength / VectorCrossProduct / VectorDotProduct / VectorRotate</span>
+        <span class="method-ret">→ vector/float</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Full set of 3D vector math operations. Vectors are plain [x, y, z] lists.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+a <span class="op">=</span> [<span class="nm">1</span>, <span class="nm">0</span>, <span class="nm">0</span>]
+b <span class="op">=</span> [<span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">0</span>]
+
+v_sum   <span class="op">=</span> rs.<span class="fn">VectorAdd</span>(a, b)         <span class="cm"># [1,1,0]</span>
+v_diff  <span class="op">=</span> rs.<span class="fn">VectorSubtract</span>(a, b)    <span class="cm"># [1,-1,0]</span>
+v_scale <span class="op">=</span> rs.<span class="fn">VectorScale</span>(a, <span class="nm">5</span>)       <span class="cm"># [5,0,0]</span>
+v_unit  <span class="op">=</span> rs.<span class="fn">VectorUnitize</span>(v_sum)    <span class="cm"># unit vector</span>
+length  <span class="op">=</span> rs.<span class="fn">VectorLength</span>(v_sum)     <span class="cm"># √2 ≈ 1.414</span>
+cross   <span class="op">=</span> rs.<span class="fn">VectorCrossProduct</span>(a, b) <span class="cm"># [0,0,1] = Z-axis</span>
+dot     <span class="op">=</span> rs.<span class="fn">VectorDotProduct</span>(a, b)   <span class="cm"># 0 (perpendicular)</span>
+rot_v   <span class="op">=</span> rs.<span class="fn">VectorRotate</span>(a, <span class="nm">90</span>, [<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">1</span>])  <span class="cm"># rotate 90° around Z</span>
+
+<span class="bi">print</span>(<span class="st">f"Cross product: </span>{cross}<span class="st">"</span>)
+<span class="bi">print</span>(<span class="st">f"Parallel? {rs.IsVectorParallelTo(a, [</span><span class="nm">2</span><span class="st">,</span><span class="nm">0</span><span class="st">,</span><span class="nm">0</span><span class="st">])}"</span>)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="pointadd pointsubtract pointcreate">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">PointAdd / PointSubtract</span>
+        <span class="method-sig">(point, vector)</span>
+        <span class="method-ret">→ point3d</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Move a point by a vector (point arithmetic).</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+pt  <span class="op">=</span> [<span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>]
+vec <span class="op">=</span> [<span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">5</span>]
+pt2 <span class="op">=</span> rs.<span class="fn">PointAdd</span>(pt, vec)      <span class="cm"># [0, 0, 5]</span>
+pt3 <span class="op">=</span> rs.<span class="fn">PointSubtract</span>(pt2, vec) <span class="cm"># back to [0, 0, 0]</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── MESH ────────────── -->
+  <section class="cat-section" id="mesh">
+    <div class="cat-title"><span>Mesh</span><span class="cat-badge badge-object">mesh</span>
+      <button class="expand-all" onclick="toggleSection('mesh')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="addmesh meshvertices meshfacevertices">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddMesh / MeshVertices / MeshFaceVertices</span>
+        <span class="method-sig">various</span>
+        <span class="method-ret">→ guid / list</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc"><strong>AddMesh</strong> — create mesh from vertex list and face indices. <strong>MeshVertices</strong> — get vertex coordinates. <strong>MeshFaceVertices</strong> — get vertex indices per face.</div>
+        <div class="example-title">Example — Create a simple quad mesh</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+verts  <span class="op">=</span> [[<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>],[<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>],[<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>],[<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">0</span>]]
+<span class="cm"># Face: 4 vertex indices (quad) = [v0, v1, v2, v3]</span>
+faces  <span class="op">=</span> [(<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>)]
+mesh   <span class="op">=</span> rs.<span class="fn">AddMesh</span>(verts, faces)
+
+<span class="cm"># Read back</span>
+v_out <span class="op">=</span> rs.<span class="fn">MeshVertices</span>(mesh)
+f_out <span class="op">=</span> rs.<span class="fn">MeshFaceVertices</span>(mesh)
+<span class="bi">print</span>(<span class="st">f"{</span><span class="bi">len</span>(v_out)<span class="st">} verts, {</span><span class="bi">len</span>(f_out)<span class="st">} faces"</span>)</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── LAYER ────────────── -->
+  <section class="cat-section" id="layer">
+    <div class="cat-title"><span>Layer</span><span class="cat-badge badge-util">layer</span>
+      <button class="expand-all" onclick="toggleSection('layer')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="addlayer objectlayer layernames currentlayer">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddLayer / ObjectLayer / LayerNames / CurrentLayer</span>
+        <span class="method-sig">various</span>
+        <span class="method-ret">→ str / bool</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Full layer management. Layers use double-colon syntax for nesting: "Parent::Child".</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+<span class="cm"># Create layers</span>
+rs.<span class="fn">AddLayer</span>(<span class="st">"Structure"</span>)
+rs.<span class="fn">AddLayer</span>(<span class="st">"Structure::Beams"</span>)   <span class="cm"># nested layer</span>
+rs.<span class="fn">AddLayer</span>(<span class="st">"Structure::Columns"</span>)
+
+<span class="cm"># Set layer color</span>
+rs.<span class="fn">LayerColor</span>(<span class="st">"Structure::Beams"</span>, (<span class="nm">255</span>, <span class="nm">100</span>, <span class="nm">0</span>))
+
+<span class="cm"># Move object to layer</span>
+obj <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Select beam"</span>)
+rs.<span class="fn">ObjectLayer</span>(obj, <span class="st">"Structure::Beams"</span>)
+
+<span class="cm"># List all layers</span>
+layers <span class="op">=</span> rs.<span class="fn">LayerNames</span>()
+<span class="kw">for</span> l <span class="kw">in</span> layers: <span class="bi">print</span>(l)</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── SELECTION ────────────── -->
+  <section class="cat-section" id="selection">
+    <div class="cat-title"><span>Selection</span><span class="cat-badge badge-ui">select</span>
+      <button class="expand-all" onclick="toggleSection('selection')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="getobject getobjects getpoint">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">GetObject / GetObjects / GetPoint</span>
+        <span class="method-sig">(message, filter, preselect, ...)</span>
+        <span class="method-ret">→ guid / list / point</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Interactive selection prompts. <strong>GetObject</strong> picks one object; <strong>GetObjects</strong> picks multiple; <strong>GetPoint</strong> picks a 3D coordinate.</div>
+        <div class="params-title">Filter constants (rs.filter.*)</div>
+        <div class="param-row"><span class="param-name">rs.filter.point</span><span class="param-type">1</span><span class="param-desc">Points</span></div>
+        <div class="param-row"><span class="param-name">rs.filter.curve</span><span class="param-type">4</span><span class="param-desc">Curves</span></div>
+        <div class="param-row"><span class="param-name">rs.filter.surface</span><span class="param-type">8</span><span class="param-desc">Surfaces/Breps</span></div>
+        <div class="param-row"><span class="param-name">rs.filter.polysurface</span><span class="param-type">16</span><span class="param-desc">Polysurfaces</span></div>
+        <div class="param-row"><span class="param-name">rs.filter.mesh</span><span class="param-type">32</span><span class="param-desc">Meshes</span></div>
+        <div class="param-row"><span class="param-name">rs.filter.annotation</span><span class="param-type">512</span><span class="param-desc">Annotations</span></div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+
+<span class="cm"># Select one curve</span>
+crv <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Select a curve"</span>, rs.filter.curve)
+<span class="kw">if not</span> crv: <span class="bi">print</span>(<span class="st">"Cancelled"</span>); exit()
+
+<span class="cm"># Select multiple surfaces</span>
+srfs <span class="op">=</span> rs.<span class="fn">GetObjects</span>(<span class="st">"Select surfaces"</span>, rs.filter.surface)
+
+<span class="cm"># Pick a point with snap</span>
+pt <span class="op">=</span> rs.<span class="fn">GetPoint</span>(<span class="st">"Pick base point"</span>)
+
+<span class="cm"># Get surface specifically</span>
+s <span class="op">=</span> rs.<span class="fn">GetSurfaceObject</span>(<span class="st">"Select surface"</span>)
+<span class="cm"># Returns (surface_id, uv_param, point) tuple</span></pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="selectobject unselectobject selectallobjects">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">SelectObject / UnselectObject / SelectAllObjects</span>
+        <span class="method-sig">(object_id)</span>
+        <span class="method-ret">→ bool</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Programmatically select/deselect objects in the viewport.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+curves <span class="op">=</span> rs.<span class="fn">ObjectsByType</span>(rs.filter.curve)
+<span class="kw">for</span> c <span class="kw">in</span> curves: rs.<span class="fn">SelectObject</span>(c)</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── USER INTERFACE ────────────── -->
+  <section class="cat-section" id="userinterface">
+    <div class="cat-title"><span>User Interface</span><span class="cat-badge badge-ui">UI</span>
+      <button class="expand-all" onclick="toggleSection('userinterface')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="getstring getnumber getinteger getboolean">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">GetString / GetNumber / GetInteger / GetBoolean</span>
+        <span class="method-sig">(message, default, options)</span>
+        <span class="method-ret">→ str / float / int / bool</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Simple command-line input prompts. Returns None if user cancels.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+
+name   <span class="op">=</span> rs.<span class="fn">GetString</span>(<span class="st">"Project name"</span>, <span class="st">"MyProject"</span>)
+count  <span class="op">=</span> rs.<span class="fn">GetInteger</span>(<span class="st">"How many copies"</span>, <span class="nm">5</span>, <span class="nm">1</span>, <span class="nm">100</span>)
+scale  <span class="op">=</span> rs.<span class="fn">GetNumber</span>(<span class="st">"Scale factor"</span>, <span class="nm">1.0</span>)
+mirror <span class="op">=</span> rs.<span class="fn">GetBoolean</span>(<span class="st">"Mirror?"</span>, [<span class="st">"Mirror"</span>,<span class="st">"No"</span>,<span class="st">"Yes"</span>], [<span class="kw">True</span>])
+
+<span class="kw">if</span> name <span class="kw">is not None</span>:
+    <span class="bi">print</span>(<span class="st">f"Creating {count} copies of '{name}'"</span>)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="messagebox inputbox listbox editbox">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">MessageBox / ListBox / EditBox / StringBox</span>
+        <span class="method-sig">various</span>
+        <span class="method-ret">→ str / int</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Popup dialog boxes for user interaction.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+
+<span class="cm"># Simple message</span>
+rs.<span class="fn">MessageBox</span>(<span class="st">"Done! Script completed successfully."</span>)
+
+<span class="cm"># List choice</span>
+items  <span class="op">=</span> [<span class="st">"Concrete"</span>, <span class="st">"Steel"</span>, <span class="st">"Timber"</span>, <span class="st">"Composite"</span>]
+choice <span class="op">=</span> rs.<span class="fn">ListBox</span>(items, <span class="st">"Material type:"</span>, <span class="st">"Select Material"</span>)
+
+<span class="cm"># Multi-line text input</span>
+text <span class="op">=</span> rs.<span class="fn">EditBox</span>(<span class="st">"Enter your notes:"</span>, <span class="st">"Notes"</span>, <span class="st">"Script Notes"</span>)
+
+<span class="bi">print</span>(<span class="st">f"Selected: {choice}"</span>)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="getcolor">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">GetColor</span>
+        <span class="method-sig">(color=(0,0,0))</span>
+        <span class="method-ret">→ (r,g,b)</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Displays Rhino's color picker dialog. Returns selected color as (r, g, b) tuple or None if cancelled.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+obj   <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Object to color"</span>)
+color <span class="op">=</span> rs.<span class="fn">GetColor</span>(rs.<span class="fn">ObjectColor</span>(obj))
+<span class="kw">if</span> color:
+    rs.<span class="fn">ObjectColor</span>(obj, color)</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── UTILITY ────────────── -->
+  <section class="cat-section" id="utility">
+    <div class="cat-title"><span>Utility</span><span class="cat-badge badge-util">util</span>
+      <button class="expand-all" onclick="toggleSection('utility')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="unitabsolutetolerance unitangulartolerance">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">UnitAbsoluteTolerance / UnitAngleTolerance</span>
+        <span class="method-sig">(in_host_units=False)</span>
+        <span class="method-ret">→ float</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Returns the document's absolute tolerance setting. Crucial for robust geometry checks.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+tol <span class="op">=</span> rs.<span class="fn">UnitAbsoluteTolerance</span>()  <span class="cm"># typically 0.001</span>
+crv <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Curve"</span>, rs.filter.curve)
+length <span class="op">=</span> rs.<span class="fn">CurveLength</span>(crv)
+<span class="kw">if</span> length <span class="op">&lt;</span> tol:
+    <span class="bi">print</span>(<span class="st">"Curve is effectively zero-length"</span>)
+<span class="kw">elif</span> length <span class="op">&lt;</span> tol <span class="op">*</span> <span class="nm">10</span>:
+    <span class="bi">print</span>(<span class="st">"Curve is very short"</span>)</pre>
+      </div>
+    </div>
+
+    <div class="method" data-name="zoomextents zoomselected redraw">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">ZoomExtents / ZoomSelected / Redraw</span>
+        <span class="method-sig">(view=None) / ()</span>
+        <span class="method-ret">→ none</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Control viewport display.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+rs.<span class="fn">EnableRedraw</span>(<span class="kw">False</span>)
+<span class="cm"># ... batch operations ...</span>
+rs.<span class="fn">EnableRedraw</span>(<span class="kw">True</span>)
+rs.<span class="fn">ZoomExtents</span>()   <span class="cm"># fit all in view</span>
+rs.<span class="fn">Redraw</span>()        <span class="cm"># force refresh</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── TRANSFORMATION ────────────── -->
+  <section class="cat-section" id="transformation">
+    <div class="cat-title"><span>Transformation</span><span class="cat-badge badge-geom">xform</span>
+      <button class="expand-all" onclick="toggleSection('transformation')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="xformtranslation xformrotation xformscale xformplanarproject">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">XformTranslation / XformRotation / XformScale</span>
+        <span class="method-sig">various</span>
+        <span class="method-ret">→ 4×4 matrix</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Build transformation matrices. Use with <code>TransformObject</code> for custom transforms.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+obj   <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Object"</span>)
+xform <span class="op">=</span> rs.<span class="fn">XformTranslation</span>([<span class="nm">5</span>,<span class="nm">0</span>,<span class="nm">0</span>])   <span class="cm"># move +5 in X</span>
+rs.<span class="fn">TransformObject</span>(obj, xform)
+
+<span class="cm"># Combine transforms (rotation then translate)</span>
+rot   <span class="op">=</span> rs.<span class="fn">XformRotation2</span>(<span class="nm">45</span>, [<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">1</span>], [<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>])
+trans <span class="op">=</span> rs.<span class="fn">XformTranslation</span>([<span class="nm">10</span>,<span class="nm">0</span>,<span class="nm">0</span>])
+combined <span class="op">=</span> rs.<span class="fn">XformMultiply</span>(trans, rot)
+rs.<span class="fn">TransformObject</span>(obj, combined, copy<span class="op">=</span><span class="kw">True</span>)</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── VIEW ────────────── -->
+  <section class="cat-section" id="view">
+    <div class="cat-title"><span>View</span><span class="cat-badge badge-ui">view</span>
+      <button class="expand-all" onclick="toggleSection('view')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="viewnames currentview viewdisplaymode">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">ViewNames / CurrentView / ViewDisplayMode</span>
+        <span class="method-sig">various</span>
+        <span class="method-ret">→ str / list</span>
+      </div>
+      <div class="method-body">
+        <div class="method-desc">Query and control viewport settings.</div>
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+views <span class="op">=</span> rs.<span class="fn">ViewNames</span>()      <span class="cm"># ["Top","Front","Right","Perspective"]</span>
+cur   <span class="op">=</span> rs.<span class="fn">CurrentView</span>()    <span class="cm"># active view name</span>
+rs.<span class="fn">CurrentView</span>(<span class="st">"Perspective"</span>)
+
+<span class="cm"># Set display mode</span>
+rs.<span class="fn">ViewDisplayMode</span>(cur, <span class="st">"Rendered"</span>)  <span class="cm"># or "Wireframe", "Shaded"</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── DOCUMENT ────────────── -->
+  <section class="cat-section" id="document">
+    <div class="cat-title"><span>Document</span><span class="cat-badge badge-util">doc</span>
+      <button class="expand-all" onclick="toggleSection('document')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="documentname documentsaved savefile">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">DocumentName / DocumentSaved / SaveFile</span>
+        <span class="method-sig">()</span>
+        <span class="method-ret">→ str / bool</span>
+      </div>
+      <div class="method-body">
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+name  <span class="op">=</span> rs.<span class="fn">DocumentName</span>()    <span class="cm"># "myfile.3dm" or None</span>
+saved <span class="op">=</span> rs.<span class="fn">DocumentSaved</span>()   <span class="cm"># False if unsaved changes</span>
+<span class="kw">if not</span> saved:
+    rs.<span class="fn">SaveFile</span>()             <span class="cm"># saves to current path</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── BLOCK ────────────── -->
+  <section class="cat-section" id="block">
+    <div class="cat-title"><span>Block</span><span class="cat-badge badge-util">block</span>
+      <button class="expand-all" onclick="toggleSection('block')">Expand All</button>
+    </div>
+
+    <div class="method" data-name="isblock insertblock blocknames">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">IsBlock / InsertBlock / BlockNames</span>
+        <span class="method-sig">various</span>
+        <span class="method-ret">→ various</span>
+      </div>
+      <div class="method-body">
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+blocks <span class="op">=</span> rs.<span class="fn">BlockNames</span>()
+<span class="bi">print</span>(<span class="st">"Blocks in document:"</span>, blocks)
+
+obj <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Select"</span>)
+<span class="kw">if</span> rs.<span class="fn">IsBlock</span>(obj): <span class="bi">print</span>(<span class="st">"It's a block instance"</span>)
+
+<span class="cm"># Insert at origin, scale 1, no rotation</span>
+rs.<span class="fn">InsertBlock</span>(<span class="st">"MyBlock"</span>, [<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>])</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── GROUP ────────────── -->
+  <section class="cat-section" id="group">
+    <div class="cat-title"><span>Group</span><span class="cat-badge badge-util">group</span></div>
+
+    <div class="method" data-name="addgroup addobjectstogroup objectgroups">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddGroup / AddObjectsToGroup / ObjectGroups</span>
+        <span class="method-sig">various</span>
+        <span class="method-ret">→ str / int</span>
+      </div>
+      <div class="method-body">
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+objs    <span class="op">=</span> rs.<span class="fn">GetObjects</span>(<span class="st">"Select objects to group"</span>)
+grp_name <span class="op">=</span> rs.<span class="fn">AddGroup</span>(<span class="st">"BeamGroup"</span>)  <span class="cm"># create named group</span>
+rs.<span class="fn">AddObjectsToGroup</span>(objs, grp_name)
+<span class="bi">print</span>(rs.<span class="fn">ObjectGroups</span>(objs[<span class="nm">0</span>]))      <span class="cm"># ['BeamGroup']</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── MATERIAL ────────────── -->
+  <section class="cat-section" id="material">
+    <div class="cat-title"><span>Material</span><span class="cat-badge badge-util">mat</span></div>
+
+    <div class="method" data-name="addmaterial objectmaterialsource objectmaterialindex">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddMaterial / ObjectMaterialSource / ObjectMaterialIndex</span>
+        <span class="method-sig">various</span>
+        <span class="method-ret">→ int / bool</span>
+      </div>
+      <div class="method-body">
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+obj     <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Object"</span>)
+mat_idx <span class="op">=</span> rs.<span class="fn">AddMaterial</span>()
+rs.<span class="fn">MaterialColor</span>(mat_idx, (<span class="nm">200</span>, <span class="nm">50</span>, <span class="nm">50</span>))
+rs.<span class="fn">MaterialShininess</span>(mat_idx, <span class="nm">0.8</span>)
+<span class="cm"># Tell object to use its own material</span>
+rs.<span class="fn">ObjectMaterialSource</span>(obj, <span class="nm">1</span>)
+rs.<span class="fn">ObjectMaterialIndex</span>(obj, mat_idx)</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── HATCH ────────────── -->
+  <section class="cat-section" id="hatch">
+    <div class="cat-title"><span>Hatch</span><span class="cat-badge badge-util">hatch</span></div>
+
+    <div class="method" data-name="addhatch hatchpatternnames">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddHatch / HatchPatternNames</span>
+        <span class="method-sig">(curve_id, hatch_pattern, scale, rotation)</span>
+        <span class="method-ret">→ guid</span>
+      </div>
+      <div class="method-body">
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+patterns <span class="op">=</span> rs.<span class="fn">HatchPatternNames</span>()
+<span class="bi">print</span>(<span class="st">"Available hatches:"</span>, patterns)
+
+crv   <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Closed curve"</span>, rs.filter.curve)
+hatch <span class="op">=</span> rs.<span class="fn">AddHatch</span>(crv, <span class="st">"Solid"</span>, <span class="nm">1</span>, <span class="nm">0</span>)</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── LIGHT ────────────── -->
+  <section class="cat-section" id="light">
+    <div class="cat-title"><span>Light</span><span class="cat-badge badge-util">light</span></div>
+
+    <div class="method" data-name="addpointlight adddirectionallight addspotlight">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">AddPointLight / AddDirectionalLight / AddSpotLight</span>
+        <span class="method-sig">various</span>
+        <span class="method-ret">→ guid</span>
+      </div>
+      <div class="method-body">
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+pt_light  <span class="op">=</span> rs.<span class="fn">AddPointLight</span>([<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">10</span>])
+dir_light <span class="op">=</span> rs.<span class="fn">AddDirectionalLight</span>([<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">10</span>], [<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>])
+spot      <span class="op">=</span> rs.<span class="fn">AddSpotLight</span>([<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">10</span>], <span class="nm">5</span>, [<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>])</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── LINETYPE ────────────── -->
+  <section class="cat-section" id="linetype">
+    <div class="cat-title"><span>Linetype</span><span class="cat-badge badge-util">line</span></div>
+    <div class="method" data-name="objectlinetype objectlinetypesource linetypenames">
+      <div class="method-head" onclick="toggle(this)">
+        <span class="method-name">ObjectLineType / ObjectLineTypeSource / LinetypeNames</span>
+        <span class="method-sig">various</span>
+        <span class="method-ret">→ str</span>
+      </div>
+      <div class="method-body">
+        <div class="example-title">Example</div>
+        <pre class="example"><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+obj <span class="op">=</span> rs.<span class="fn">GetObject</span>(<span class="st">"Object"</span>)
+<span class="bi">print</span>(<span class="st">"Linetypes:"</span>, rs.<span class="fn">LinetypeNames</span>())
+rs.<span class="fn">ObjectLineTypeSource</span>(obj, <span class="nm">1</span>)      <span class="cm"># use object linetype</span>
+rs.<span class="fn">ObjectLineType</span>(obj, <span class="st">"Dashed"</span>)</pre>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <strong>RhinoPy Complete</strong> · Offline API Reference · Created by <strong>Dinesh Kumar Alagusundaram</strong><br>
+    Data sourced from <a href="https://developer.rhino3d.com/api/RhinoScriptSyntax/" target="_blank">developer.rhino3d.com/api/RhinoScriptSyntax</a><br>
+    Additional examples from <em>Python Primer for Rhino</em> (Tibbits, van der Harten, Baer — McNeel) and <em>RhinoScript101</em> (Rutten — McNeel).<br>
+    <a href="LICENSE.md">📄 MIT License</a> — Free to use · Free to share · Free to modify · Free for commercial use<br>
+    Created by Dinesh Kumar Alagusundaram · Keep this credit when redistributing · Rhino® is a trademark of Robert McNeel &amp; Associates.<br>
+    <a href="index.html">Home</a> · <a href="learn.html">Learn</a> · <a href="cheatsheet.html">Cheatsheet</a>
+  </footer>
+</main>
+
+<script>
+function toggle(head){
+  const m=head.closest('.method');
+  m.classList.toggle('open');
+}
+function toggleSection(id){
+  const s=document.getElementById(id);
+  const ms=s.querySelectorAll('.method');
+  const anyOpen=[...ms].some(m=>m.classList.contains('open'));
+  ms.forEach(m=>{ if(anyOpen) m.classList.remove('open'); else m.classList.add('open'); });
+}
+function filterMethods(q){
+  q=q.toLowerCase().trim();
+  document.querySelectorAll('.method').forEach(m=>{
+    const name=(m.dataset.name||'').toLowerCase();
+    const text=m.textContent.toLowerCase();
+    const show=!q||name.includes(q)||text.includes(q);
+    m.style.display=show?'':'none';
+    if(q&&show) m.classList.add('open');
+    else if(!q) m.classList.remove('open');
+  });
+  document.querySelectorAll('.cat-section').forEach(s=>{
+    const visible=[...s.querySelectorAll('.method')].some(m=>m.style.display!=='none');
+    s.style.display=visible?'':'none';
+  });
+}
+// Highlight active sidebar item on scroll
+const sections=document.querySelectorAll('.cat-section');
+const links=document.querySelectorAll('.sb-cat');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  sections.forEach(s=>{if(s.getBoundingClientRect().top<200)cur=s.id});
+  links.forEach(l=>{l.classList.toggle('active',l.getAttribute('href')==='#'+cur)});
+});
+</script>
+</body>
+</html>
