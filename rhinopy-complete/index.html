@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- RhinoPy Complete Learning Package · Copyright (c) 2024 Dinesh Kumar Alagusundaram · MIT License -->
+<!-- Sources: Python Primer for Rhino (Tibbits/McNeel 2011), RhinoScript101 (Rutten/McNeel 2008) -->
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RhinoPy · Python for Rhino & Grasshopper</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04070d;--card:#080f1a;--card2:#0b1422;--border:rgba(255,255,255,0.07);--accent:#3ef0ff;--gold:#ffd166;--purple:#b06eff;--green:#3dffa0;--red:#ff6b6b;--text:#e8edf5;--muted:#5a6a82;--mono:'Space Mono',monospace;--sans:'Space Grotesk',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 120% 80% at 20% 10%,rgba(62,240,255,0.04) 0%,transparent 60%),radial-gradient(ellipse 80% 60% at 80% 80%,rgba(176,110,255,0.05) 0%,transparent 50%);pointer-events:none;z-index:0}
+/* NAV */
+nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);background:rgba(4,7,13,0.88);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;padding:0 2rem;height:54px}
+.nav-logo{font-family:var(--mono);font-size:.95rem;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:-.01em;margin-right:2rem}
+.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:2px;flex:1}
+.nav-a{font-family:var(--mono);font-size:.7rem;color:var(--muted);text-decoration:none;padding:5px 12px;border-radius:5px;letter-spacing:.04em;transition:all .15s}
+.nav-a:hover,.nav-a.on{color:var(--accent);background:rgba(62,240,255,.07)}
+.nav-badge{margin-left:auto;font-family:var(--mono);font-size:.62rem;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:4px;padding:3px 9px;letter-spacing:.06em}
+/* HERO */
+.hero{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:6rem 2rem 4rem}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.68rem;color:var(--accent);letter-spacing:.16em;text-transform:uppercase;margin-bottom:2rem;background:rgba(62,240,255,.06);border:1px solid rgba(62,240,255,.18);padding:5px 14px;border-radius:4px}
+.hero-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.hero h1{font-size:clamp(2.6rem,5.5vw,4.8rem);font-weight:700;line-height:1.03;letter-spacing:-.04em;margin-bottom:1.5rem}
+.hero h1 .a1{color:var(--accent)}
+.hero h1 .a2{color:var(--purple)}
+.hero-p{font-size:1.05rem;color:var(--muted);line-height:1.75;max-width:520px;margin-bottom:2.5rem}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:7px;font-family:var(--mono);font-size:.75rem;font-weight:700;letter-spacing:.04em;text-decoration:none;transition:all .2s;cursor:pointer;border:none}
+.btn-p{background:var(--accent);color:#04070d}.btn-p:hover{background:#5ef4ff;transform:translateY(-1px);box-shadow:0 8px 28px rgba(62,240,255,.25)}
+.btn-s{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted)}.btn-s:hover{border-color:var(--accent);color:var(--accent)}
+.btn-t{background:transparent;border:1px solid rgba(176,110,255,.3);color:var(--purple)}.btn-t:hover{border-color:var(--purple);background:rgba(176,110,255,.07)}
+/* SOURCES STRIP */
+.sources{max-width:1100px;margin:0 auto 3rem;padding:0 2rem;position:relative;z-index:1}
+.src-label{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+.src-row{display:flex;gap:8px;flex-wrap:wrap}
+.src-chip{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:7px 13px;font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+/* SECTIONS */
+section{max-width:1100px;margin:0 auto;padding:0 2rem 5rem;position:relative;z-index:1}
+.sec-tag{font-family:var(--mono);font-size:.64rem;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.6rem}
+.sec-h{font-size:clamp(1.7rem,2.8vw,2.3rem);font-weight:700;letter-spacing:-.03em;margin-bottom:.7rem}
+.sec-p{color:var(--muted);font-size:.95rem;line-height:1.75;max-width:580px;margin-bottom:2.5rem}
+/* CHAPTER GRID */
+.ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.ch-card{display:block;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.6rem 1.8rem;text-decoration:none;transition:all .2s;position:relative;overflow:hidden}
+.ch-card::after{content:'';position:absolute;inset:0;opacity:0;background:linear-gradient(135deg,rgba(62,240,255,.04),transparent 60%);transition:opacity .25s}
+.ch-card:hover{border-color:rgba(62,240,255,.3);transform:translateY(-2px);box-shadow:0 6px 28px rgba(0,0,0,.35)}.ch-card:hover::after{opacity:1}
+.ch-num{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.1em;margin-bottom:.8rem}
+.ch-icon{font-size:1.6rem;margin-bottom:.7rem;display:block}
+.ch-title{font-size:1rem;font-weight:600;margin-bottom:.4rem}
+.ch-desc{font-size:.82rem;color:var(--muted);line-height:1.6;margin-bottom:.9rem}
+.ch-tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-family:var(--mono);font-size:.62rem;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);padding:2px 8px;border-radius:3px}
+/* API GRID */
+.api-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:9px}
+.api-card{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:.9rem 1.1rem;text-decoration:none;transition:all .2s}
+.api-card:hover{border-color:rgba(176,110,255,.35);background:rgba(176,110,255,.04)}
+.api-cat{font-family:var(--mono);font-size:.6rem;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-bottom:.3rem}
+.api-name{font-size:.88rem;font-weight:600;color:var(--text)}
+.api-ct{font-family:var(--mono);font-size:.65rem;color:var(--muted);margin-top:3px}
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-family:var(--mono);font-size:.68rem;color:var(--muted);position:relative;z-index:1}
+footer a{color:var(--accent);text-decoration:none}
+@media(max-width:650px){.hero,.sources,section{padding-left:1rem;padding-right:1rem}nav{padding:0 1rem}}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="index.html">Rhino<span>Py</span></a>
+  <div class="nav-links">
+    <a class="nav-a on" href="learn.html">Learn</a>
+    <a class="nav-a" href="api.html">API Ref</a>
+    <a class="nav-a" href="cheatsheet.html">Cheatsheet</a>
+  </div>
+  <div class="nav-badge">Offline Package v2</div>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">Complete Offline Learning Package</div>
+  <div style="display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.65rem;color:#34d399;letter-spacing:.12em;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);padding:4px 12px;border-radius:4px;margin-bottom:1rem;margin-left:8px"><span style="color:#34d399">⚖</span> MIT License — Open Source</div>
+  <div style="display:block;font-family:var(--mono);font-size:.68rem;color:#8b949e;margin-bottom:1.8rem">Created by <strong style="color:#c9d1d9">Dinesh Kumar Alagusundaram</strong></div>
+  <h1>Python for<br><span class="a1">Rhino</span> &amp; <span class="a2">Grasshopper</span></h1>
+  <p class="hero-p">Everything you need to master Python scripting in Rhino — drawn from the official Primer, RhinoScript101, and the complete live API. Reads offline, no internet needed.</p>
+  <div class="hero-btns">
+    <a href="learn.html" class="btn btn-p">▶&nbsp; Start Learning</a>
+    <a href="api.html" class="btn btn-s">⚙&nbsp; API Reference</a>
+    <a href="cheatsheet.html" class="btn btn-t">⚡&nbsp; Cheatsheet</a>
+  </div>
+</div>
+
+<div class="sources">
+  <div class="src-label">Content sourced from</div>
+  <div class="src-row">
+    <div class="src-chip"><span class="dot" style="background:var(--accent)"></span>Python Primer for Rhino — Tibbits / van der Harten / Baer (2011, Rev 3)</div>
+    <div class="src-chip"><span class="dot" style="background:var(--gold)"></span>RhinoScript Primer 101 — D. Rutten / Robert McNeel &amp; Associates</div>
+    <div class="src-chip"><span class="dot" style="background:var(--purple)"></span>RhinoScriptSyntax Live API — developer.rhino3d.com (offline snapshot)</div>
+    <div class="src-chip"><span class="dot" style="background:var(--green)"></span>Rhino.Geometry (RhinoCommon) — .NET geometry SDK</div>
+  </div>
+</div>
+
+<section>
+  <div class="sec-tag">Curriculum</div>
+  <div class="sec-h">12 Chapters, Zero to Expert</div>
+  <p class="sec-p">Each chapter builds on the last — from Rhino macros to full NURBS geometry scripting. Real code from the official primers throughout.</p>
+  <div class="ch-grid">
+    <a href="learn.html#ch1" class="ch-card"><div class="ch-num">CH 01</div><span class="ch-icon">🐍</span><div class="ch-title">What is Scripting?</div><div class="ch-desc">Macros vs Scripts vs Programs. The EditPythonScript editor. Running your first line of code.</div><div class="ch-tags"><span class="tag">macros</span><span class="tag">editor</span><span class="tag">RunPythonScript</span></div></a>
+    <a href="learn.html#ch2" class="ch-card"><div class="ch-num">CH 02</div><span class="ch-icon">📦</span><div class="ch-title">Python Essentials</div><div class="ch-desc">Variables, all data types, naming conventions, indentation, case sensitivity, flow control.</div><div class="ch-tags"><span class="tag">int</span><span class="tag">float</span><span class="tag">str</span><span class="tag">bool</span><span class="tag">None</span></div></a>
+    <a href="learn.html#ch3" class="ch-card"><div class="ch-num">CH 03</div><span class="ch-icon">( )</span><div class="ch-title">Brackets Decoded</div><div class="ch-desc">All three bracket types: parentheses for calls, square for lists/indexing, curly for dicts.</div><div class="ch-tags"><span class="tag">( )</span><span class="tag">[ ]</span><span class="tag">{ }</span><span class="tag">slicing</span></div></a>
+    <a href="learn.html#ch4" class="ch-card"><div class="ch-num">CH 04</div><span class="ch-icon">⚡</span><div class="ch-title">Operators &amp; Functions</div><div class="ch-desc">All operator types, precedence, def / return, default args, variable scope, mutability.</div><div class="ch-tags"><span class="tag">+−×÷</span><span class="tag">def</span><span class="tag">return</span><span class="tag">scope</span></div></a>
+    <a href="learn.html#ch5" class="ch-card"><div class="ch-num">CH 05</div><span class="ch-icon">◈</span><div class="ch-title">Conditionals</div><div class="ch-desc">if / elif / else chains. Boolean logic with Venn diagrams. Rhino object classification examples.</div><div class="ch-tags"><span class="tag">if</span><span class="tag">elif</span><span class="tag">else</span><span class="tag">and</span><span class="tag">or</span><span class="tag">not</span></div></a>
+    <a href="learn.html#ch6" class="ch-card"><div class="ch-num">CH 06</div><span class="ch-icon">↻</span><div class="ch-title">Loops</div><div class="ch-desc">while and for loops. Sine wave example. Sphere distribution with nested loops. break / continue.</div><div class="ch-tags"><span class="tag">for</span><span class="tag">while</span><span class="tag">range()</span><span class="tag">break</span><span class="tag">frange</span></div></a>
+    <a href="learn.html#ch7" class="ch-card"><div class="ch-num">CH 07</div><span class="ch-icon">📋</span><div class="ch-title">Lists, Tuples, Dicts</div><div class="ch-desc">All container types with methods, list comprehensions, nested lists, mutability deep dive.</div><div class="ch-tags"><span class="tag">list</span><span class="tag">tuple</span><span class="tag">dict</span><span class="tag">mutable</span><span class="tag">[ : ]</span></div></a>
+    <a href="learn.html#ch8" class="ch-card"><div class="ch-num">CH 08</div><span class="ch-icon">🏛</span><div class="ch-title">Classes</div><div class="ch-desc">Object-Oriented Programming: __init__, self, inheritance, polymorphism, isinstance().</div><div class="ch-tags"><span class="tag">class</span><span class="tag">__init__</span><span class="tag">self</span><span class="tag">inherit</span></div></a>
+    <a href="learn.html#ch9" class="ch-card"><div class="ch-num">CH 09</div><span class="ch-icon">📐</span><div class="ch-title">Geometry Deep Dive</div><div class="ch-desc">Points, vectors, lines, planes, circles (Rusin algorithm), NURBS, surfaces, meshes, parameter spaces.</div><div class="ch-tags"><span class="tag">Point3d</span><span class="tag">NURBS</span><span class="tag">Surface</span><span class="tag">Mesh</span><span class="tag">R1/R2/R3</span></div></a>
+    <a href="learn.html#ch10" class="ch-card"><div class="ch-num">CH 10</div><span class="ch-icon">🔗</span><div class="ch-title">Imports &amp; Modules</div><div class="ch-desc">All four import forms. rs vs rg, ghpythonlib, System.Drawing. Complete GHPython template.</div><div class="ch-tags"><span class="tag">rs</span><span class="tag">rg</span><span class="tag">ghcomp</span><span class="tag">math</span><span class="tag">random</span></div></a>
+    <a href="learn.html#ch11" class="ch-card"><div class="ch-num">CH 11</div><span class="ch-icon">🐛</span><div class="ch-title">Debugging</div><div class="ch-desc">The Rhino debugger: breakpoints, step controls, variable pane. Common errors and fixes.</div><div class="ch-tags"><span class="tag">breakpoint</span><span class="tag">step</span><span class="tag">try/except</span><span class="tag">errors</span></div></a>
+    <a href="learn.html#ch12" class="ch-card"><div class="ch-num">CH 12</div><span class="ch-icon">⬡</span><div class="ch-title">Grasshopper Python</div><div class="ch-desc">GHPython setup, inputs/outputs, DataTree, rs vs rg in GH. Full point grid and facade examples.</div><div class="ch-tags"><span class="tag">GHPython</span><span class="tag">DataTree</span><span class="tag">access</span><span class="tag">color</span></div></a>
+    <a href="learn.html#ch13" class="ch-card"><div class="ch-num">CH 13</div><span class="ch-icon">✍</span><div class="ch-title">Strings Deep Dive</div><div class="ch-desc">All string methods, slicing, f-strings with format specifiers, .format(), raw strings, escape chars.</div><div class="ch-tags"><span class="tag">f-string</span><span class="tag">.split()</span><span class="tag">.join()</span><span class="tag">slice</span><span class="tag">zfill</span></div></a>
+    <a href="learn.html#ch14" class="ch-card"><div class="ch-num">CH 14</div><span class="ch-icon">🛡</span><div class="ch-title">Error Handling</div><div class="ch-desc">try/except/else/finally. All exception types. Raising custom exceptions. Defensive Rhino patterns.</div><div class="ch-tags"><span class="tag">try</span><span class="tag">except</span><span class="tag">raise</span><span class="tag">ValueError</span><span class="tag">finally</span></div></a>
+    <a href="learn.html#ch15" class="ch-card"><div class="ch-num">CH 15</div><span class="ch-icon">💾</span><div class="ch-title">File I/O</div><div class="ch-desc">Read/write txt files, with statement, JSON save/load, os.path, save script settings pattern from Primer.</div><div class="ch-tags"><span class="tag">open()</span><span class="tag">with</span><span class="tag">json</span><span class="tag">os.path</span><span class="tag">readlines</span></div></a>
+    <a href="learn.html#ch16" class="ch-card"><div class="ch-num">CH 16</div><span class="ch-icon">λ</span><div class="ch-title">Advanced Python</div><div class="ch-desc">lambda, *args/**kwargs, generators with yield, advanced list/dict/set comprehensions, map/filter.</div><div class="ch-tags"><span class="tag">lambda</span><span class="tag">*args</span><span class="tag">yield</span><span class="tag">generator</span><span class="tag">map</span></div></a>
+    <a href="learn.html#ch17" class="ch-card"><div class="ch-num">CH 17</div><span class="ch-icon">⚙</span><div class="ch-title">RhinoCommon (rg.)</div><div class="ch-desc">Point3d, Vector3d, Plane, Line, Transform, NurbsCurve, Brep. rs. vs rg. comparison. GH geometry.</div><div class="ch-tags"><span class="tag">Point3d</span><span class="tag">Vector3d</span><span class="tag">NurbsCurve</span><span class="tag">Brep</span><span class="tag">rg.</span></div></a>
+    <a href="learn.html#ch18" class="ch-card"><div class="ch-num">CH 18</div><span class="ch-icon">🏗</span><div class="ch-title">Parametric Patterns</div><div class="ch-desc">Attractor fields, mesh from f(x,y), parametric tower, GH DataTrees, the 5 parametric principles.</div><div class="ch-tags"><span class="tag">attractor</span><span class="tag">mesh</span><span class="tag">tower</span><span class="tag">lerp</span><span class="tag">normalize</span></div></a>
+  </div>
+</section>
+
+<section>
+  <div class="sec-tag">API Reference — Offline</div>
+  <div class="sec-h">RhinoScriptSyntax — 26 Categories</div>
+  <p class="sec-p">Complete offline copy of the official Rhino Python API, organized by function category. Click any card to jump to its section.</p>
+  <div class="api-grid">
+    <a href="api.html#application" class="api-card"><div class="api-cat">module</div><div class="api-name">Application</div><div class="api-ct">~35 methods</div></a>
+    <a href="api.html#block" class="api-card"><div class="api-cat">module</div><div class="api-name">Block</div><div class="api-ct">~15 methods</div></a>
+    <a href="api.html#curve" class="api-card"><div class="api-cat">module</div><div class="api-name">Curve</div><div class="api-ct">~80 methods</div></a>
+    <a href="api.html#dimension" class="api-card"><div class="api-cat">module</div><div class="api-name">Dimension</div><div class="api-ct">~12 methods</div></a>
+    <a href="api.html#document" class="api-card"><div class="api-cat">module</div><div class="api-name">Document</div><div class="api-ct">~20 methods</div></a>
+    <a href="api.html#geometry" class="api-card"><div class="api-cat">module</div><div class="api-name">Geometry</div><div class="api-ct">~15 methods</div></a>
+    <a href="api.html#grips" class="api-card"><div class="api-cat">module</div><div class="api-name">Grips</div><div class="api-ct">~8 methods</div></a>
+    <a href="api.html#group" class="api-card"><div class="api-cat">module</div><div class="api-name">Group</div><div class="api-ct">~8 methods</div></a>
+    <a href="api.html#hatch" class="api-card"><div class="api-cat">module</div><div class="api-name">Hatch</div><div class="api-ct">~6 methods</div></a>
+    <a href="api.html#layer" class="api-card"><div class="api-cat">module</div><div class="api-name">Layer</div><div class="api-ct">~25 methods</div></a>
+    <a href="api.html#light" class="api-card"><div class="api-cat">module</div><div class="api-name">Light</div><div class="api-ct">~12 methods</div></a>
+    <a href="api.html#line" class="api-card"><div class="api-cat">module</div><div class="api-name">Line</div><div class="api-ct">~8 methods</div></a>
+    <a href="api.html#linetype" class="api-card"><div class="api-cat">module</div><div class="api-name">Linetype</div><div class="api-ct">~8 methods</div></a>
+    <a href="api.html#material" class="api-card"><div class="api-cat">module</div><div class="api-name">Material</div><div class="api-ct">~15 methods</div></a>
+    <a href="api.html#mesh" class="api-card"><div class="api-cat">module</div><div class="api-name">Mesh</div><div class="api-ct">~40 methods</div></a>
+    <a href="api.html#object" class="api-card"><div class="api-cat">module</div><div class="api-name">Object</div><div class="api-ct">~45 methods</div></a>
+    <a href="api.html#plane" class="api-card"><div class="api-cat">module</div><div class="api-name">Plane</div><div class="api-ct">~12 methods</div></a>
+    <a href="api.html#pointvector" class="api-card"><div class="api-cat">module</div><div class="api-name">Point/Vector</div><div class="api-ct">~30 methods</div></a>
+    <a href="api.html#selection" class="api-card"><div class="api-cat">module</div><div class="api-name">Selection</div><div class="api-ct">~20 methods</div></a>
+    <a href="api.html#surface" class="api-card"><div class="api-cat">module</div><div class="api-name">Surface</div><div class="api-ct">~55 methods</div></a>
+    <a href="api.html#toolbar" class="api-card"><div class="api-cat">module</div><div class="api-name">Toolbar</div><div class="api-ct">~8 methods</div></a>
+    <a href="api.html#transformation" class="api-card"><div class="api-cat">module</div><div class="api-name">Transformation</div><div class="api-ct">~20 methods</div></a>
+    <a href="api.html#userdata" class="api-card"><div class="api-cat">module</div><div class="api-name">User Data</div><div class="api-ct">~10 methods</div></a>
+    <a href="api.html#userinterface" class="api-card"><div class="api-cat">module</div><div class="api-name">User Interface</div><div class="api-ct">~25 methods</div></a>
+    <a href="api.html#utility" class="api-card"><div class="api-cat">module</div><div class="api-name">Utility</div><div class="api-ct">~15 methods</div></a>
+    <a href="api.html#view" class="api-card"><div class="api-cat">module</div><div class="api-name">View</div><div class="api-ct">~30 methods</div></a>
+  </div>
+</section>
+
+<footer>
+  RhinoPy Complete Learning Package · Sources: Python Primer for Rhino (Tibbits/van der Harten/Baer · McNeel 2011) · RhinoScript101 (Rutten/McNeel 2008) · developer.rhino3d.com<br>
+  <a href="learn.html">Learn</a> · <a href="api.html">API</a> · <a href="cheatsheet.html">Cheatsheet</a> · <a href="LICENSE.md">LICENSE</a><br><br>
+  <strong style="color:var(--accent)">MIT License</strong> — Free to use · Free to share · Free to modify · Free for commercial use<br>
+  Created by Dinesh Kumar Alagusundaram · Keep this credit when redistributing · Rhino® is a trademark of Robert McNeel &amp; Associates.
+</footer>
+</body>
+</html>

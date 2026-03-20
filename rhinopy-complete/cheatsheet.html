@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- RhinoPy Complete Learning Package · Copyright (c) 2024 Dinesh Kumar Alagusundaram · MIT License -->
+<!-- Sources: Python Primer for Rhino (Tibbits/McNeel 2011), RhinoScript101 (Rutten/McNeel 2008) -->
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RhinoPy · Cheatsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080b0f;--bg2:#0d1117;--bg3:#161b22;--bg4:#1e2633;
+  --border:#2a3240;--border2:#3d4f63;
+  --fg:#c9d1d9;--fg2:#8b949e;--fg3:#6272a4;
+  --accent:#00d9ff;--accent2:#ff6b35;--accent3:#a78bfa;--accent4:#34d399;--accent5:#fbbf24;
+  --kw:#ff79c6;--st:#f1fa8c;--cm:#6272a4;--nm:#bd93f9;--fn:#50fa7b;--bi:#8be9fd;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.5;padding:32px 24px}
+.page-header{text-align:center;margin-bottom:32px}
+.page-header h1{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;color:#fff;letter-spacing:-1px}
+.page-header p{color:var(--fg3);font-size:11px;margin-top:4px}
+.nav-row{display:flex;justify-content:center;gap:16px;margin-top:10px}
+.nav-row a{color:var(--accent);text-decoration:none;font-size:11px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.card-title{
+  padding:8px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#fff;
+  background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;
+}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-a{background:var(--accent)}.dot-c{background:var(--accent2)}.dot-s{background:var(--accent3)}
+.dot-g{background:var(--accent4)}.dot-o{background:var(--accent5)}.dot-v{background:var(--kw)}
+.dot-u{background:var(--bi)}.dot-p{background:#f97316}
+.card-body{padding:12px 14px}
+pre{background:var(--bg);border-radius:5px;padding:10px 12px;font-size:11px;line-height:1.65;overflow-x:auto;margin-bottom:8px;border:1px solid var(--border)}
+pre:last-child{margin-bottom:0}
+.kw{color:var(--kw)}.st{color:var(--st)}.cm{color:var(--cm)}.nm{color:var(--nm)}.fn{color:var(--fn)}.bi{color:var(--bi)}
+.mini-table{width:100%;border-collapse:collapse;font-size:11px}
+.mini-table td,.mini-table th{padding:4px 8px;border-bottom:1px solid var(--border)}
+.mini-table th{color:var(--fg3);font-weight:600;text-align:left}
+.mini-table td:first-child{color:var(--fn)}
+.mini-table td:last-child{color:var(--fg2)}
+.lbl{color:var(--fg3);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin:8px 0 4px}
+.op{color:var(--accent2)}
+footer{text-align:center;margin-top:32px;color:var(--fg3);font-size:10px;line-height:1.8}
+footer a{color:var(--accent);text-decoration:none}
+@media print{body{background:#fff;color:#000}pre{background:#f5f5f5;border-color:#ccc}}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>RhinoPy Cheatsheet</h1>
+  <p>Python for Rhino/Grasshopper · Quick Reference · Save or Print</p>
+  <div class="nav-row">
+    <a href="index.html">← Home</a>
+    <a href="learn.html">📖 Learn</a>
+    <a href="api.html">📚 Full API</a>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- IMPORTS -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-a"></span> Imports</div>
+    <div class="card-body">
+<pre><span class="cm"># Standard — Rhino commands</span>
+<span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+
+<span class="cm"># RhinoCommon geometry kernel</span>
+<span class="kw">import</span> Rhino.Geometry <span class="kw">as</span> rg
+
+<span class="cm"># Grasshopper types</span>
+<span class="kw">import</span> Grasshopper <span class="kw">as</span> gh
+<span class="kw">import</span> ghpythonlib.components <span class="kw">as</span> ghcomp
+
+<span class="cm"># Math and system</span>
+<span class="kw">import</span> math
+<span class="kw">import</span> System.Drawing <span class="kw">as</span> sd  <span class="cm"># colors
+
+# GHPython template
+import rhinoscriptsyntax as rs
+import Rhino.Geometry as rg
+x = ...  # output</span></pre>
+    </div>
+  </div>
+
+  <!-- VARIABLES & TYPES -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-u"></span> Variables & Types</div>
+    <div class="card-body">
+<pre><span class="cm"># Naming conventions (Rutten/McNeel style)</span>
+bln_closed  = <span class="kw">True</span>        <span class="cm"># bool</span>
+int_count   = <span class="nm">10</span>           <span class="cm"># int</span>
+dbl_length  = <span class="nm">3.14</span>         <span class="cm"># float</span>
+str_name    = <span class="st">"column_01"</span>  <span class="cm"># str</span>
+arr_points  = []             <span class="cm"># list</span>
+id_curve    = None           <span class="cm"># guid</span>
+
+<span class="cm"># Type checking</span>
+<span class="bi">type</span>(x)             <span class="cm"># → &lt;class 'int'&gt;</span>
+<span class="bi">isinstance</span>(x, <span class="bi">float</span>) <span class="cm"># → True/False</span>
+
+<span class="cm"># Type conversion</span>
+<span class="bi">int</span>(<span class="nm">3.9</span>)   <span class="cm"># → 3</span>
+<span class="bi">float</span>(<span class="nm">3</span>)   <span class="cm"># → 3.0</span>
+<span class="bi">str</span>(<span class="nm">42</span>)    <span class="cm"># → "42"</span>
+<span class="bi">bool</span>(<span class="nm">0</span>)    <span class="cm"># → False</span></pre>
+    </div>
+  </div>
+
+  <!-- OPERATORS -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-p"></span> Operators</div>
+    <div class="card-body">
+      <div class="lbl">Arithmetic</div>
+<pre><span class="nm">10</span> <span class="op">+</span> <span class="nm">3</span>   <span class="cm"># 13    Addition</span>
+<span class="nm">10</span> <span class="op">-</span> <span class="nm">3</span>   <span class="cm"># 7     Subtraction</span>
+<span class="nm">10</span> <span class="op">*</span> <span class="nm">3</span>   <span class="cm"># 30    Multiplication</span>
+<span class="nm">10</span> <span class="op">/</span> <span class="nm">3</span>   <span class="cm"># 3.333 Division</span>
+<span class="nm">10</span> <span class="op">//</span> <span class="nm">3</span>  <span class="cm"># 3     Floor division</span>
+<span class="nm">10</span> <span class="op">%</span> <span class="nm">3</span>   <span class="cm"># 1     Modulo</span>
+<span class="nm">10</span> <span class="op">**</span> <span class="nm">3</span>  <span class="cm"># 1000  Power</span></pre>
+      <div class="lbl">Comparison & Logic</div>
+<pre>x <span class="op">==</span> y  x <span class="op">!=</span> y  x <span class="op">&lt;</span> y  x <span class="op">&gt;</span> y  x <span class="op">&lt;=</span> y  x <span class="op">&gt;=</span> y
+<span class="kw">and</span>   <span class="kw">or</span>   <span class="kw">not</span>   <span class="kw">in</span>   <span class="kw">is</span>   <span class="kw">is not</span></pre>
+    </div>
+  </div>
+
+  <!-- IF / ELIF / ELSE -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-c"></span> if / elif / else</div>
+    <div class="card-body">
+<pre><span class="kw">if</span> length <span class="op">&gt;</span> <span class="nm">10</span>:
+    <span class="bi">print</span>(<span class="st">"Long"</span>)
+<span class="kw">elif</span> length <span class="op">&gt;</span> <span class="nm">5</span>:
+    <span class="bi">print</span>(<span class="st">"Medium"</span>)
+<span class="kw">else</span>:
+    <span class="bi">print</span>(<span class="st">"Short"</span>)
+
+<span class="cm"># Inline (ternary)</span>
+label = <span class="st">"big"</span> <span class="kw">if</span> x <span class="op">&gt;</span> <span class="nm">5</span> <span class="kw">else</span> <span class="st">"small"</span>
+
+<span class="cm"># None check (important in Rhino!)</span>
+<span class="kw">if</span> obj <span class="kw">is not None</span>:
+    rs.<span class="fn">DeleteObject</span>(obj)
+
+<span class="cm"># Compound conditions</span>
+<span class="kw">if</span> x <span class="op">&gt;</span> <span class="nm">0</span> <span class="kw">and</span> y <span class="op">&gt;</span> <span class="nm">0</span>:
+    <span class="bi">print</span>(<span class="st">"First quadrant"</span>)</pre>
+    </div>
+  </div>
+
+  <!-- FOR LOOPS -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-g"></span> for loops</div>
+    <div class="card-body">
+<pre><span class="cm"># range(stop) / range(start, stop, step)</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nm">10</span>):          <span class="cm"># 0..9</span>
+    rs.<span class="fn">AddPoint</span>([i, <span class="nm">0</span>, <span class="nm">0</span>])
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nm">0</span>, <span class="nm">20</span>, <span class="nm">2</span>):    <span class="cm"># 0,2,4..18</span>
+    rs.<span class="fn">AddPoint</span>([i, <span class="nm">0</span>, <span class="nm">0</span>])
+
+<span class="cm"># Iterate list</span>
+<span class="kw">for</span> pt <span class="kw">in</span> points:
+    rs.<span class="fn">AddPoint</span>(pt)
+
+<span class="cm"># enumerate = index + value</span>
+<span class="kw">for</span> i, pt <span class="kw">in</span> <span class="bi">enumerate</span>(points):
+    rs.<span class="fn">ObjectName</span>(rs.<span class="fn">AddPoint</span>(pt), <span class="st">f"pt_</span>{i}<span class="st">"</span>)
+
+<span class="cm"># zip = parallel lists</span>
+<span class="kw">for</span> a, b <span class="kw">in</span> <span class="bi">zip</span>(list_a, list_b):
+    rs.<span class="fn">AddLine</span>(a, b)
+
+<span class="cm"># break / continue</span>
+<span class="kw">for</span> obj <span class="kw">in</span> objects:
+    <span class="kw">if</span> rs.<span class="fn">CurveLength</span>(obj) <span class="op">&gt;</span> <span class="nm">100</span>: <span class="kw">break</span>
+    <span class="kw">if</span> rs.<span class="fn">CurveLength</span>(obj) <span class="op">&lt;</span> <span class="nm">0.1</span>: <span class="kw">continue</span></pre>
+    </div>
+  </div>
+
+  <!-- WHILE LOOPS -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-g"></span> while loops</div>
+    <div class="card-body">
+<pre><span class="cm"># Basic while</span>
+count = <span class="nm">0</span>
+<span class="kw">while</span> count <span class="op">&lt;</span> <span class="nm">10</span>:
+    rs.<span class="fn">AddPoint</span>([count, <span class="nm">0</span>, <span class="nm">0</span>])
+    count <span class="op">+=</span> <span class="nm">1</span>
+
+<span class="cm"># Condition-driven (Rhino example)</span>
+goal = target_len <span class="op">*</span> <span class="nm">0.5</span>
+<span class="kw">while</span> rs.<span class="fn">CurveLength</span>(crv) <span class="op">&gt;</span> goal:
+    pts <span class="op">=</span> rs.<span class="fn">CurvePoints</span>(crv)
+    <span class="kw">for</span> i, pt <span class="kw">in</span> <span class="bi">enumerate</span>(pts):
+        pts[i] = rs.<span class="fn">PointAdd</span>(pt, direction)
+    <span class="cm"># update curve...</span>
+
+<span class="cm"># while True + break</span>
+<span class="kw">while</span> <span class="kw">True</span>:
+    val = rs.<span class="fn">GetNumber</span>(<span class="st">"Radius (0 to quit)"</span>)
+    <span class="kw">if</span> val <span class="kw">is None</span> <span class="kw">or</span> val <span class="op">==</span> <span class="nm">0</span>: <span class="kw">break</span>
+    rs.<span class="fn">AddCircle</span>([<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>], val)</pre>
+    </div>
+  </div>
+
+  <!-- LISTS -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-o"></span> Lists</div>
+    <div class="card-body">
+<pre><span class="cm"># Create</span>
+pts = []                   <span class="cm"># empty</span>
+pts = [[<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>],[<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>]]    <span class="cm"># with items</span>
+
+<span class="cm"># Access</span>
+pts[<span class="nm">0</span>]    <span class="cm"># first item</span>
+pts[-<span class="nm">1</span>]   <span class="cm"># last item</span>
+pts[<span class="nm">1</span>:<span class="nm">4</span>]  <span class="cm"># slice index 1..3</span>
+pts[::2]  <span class="cm"># every other item</span>
+
+<span class="cm"># Modify</span>
+pts.<span class="fn">append</span>([<span class="nm">5</span>,<span class="nm">5</span>,<span class="nm">0</span>])     <span class="cm"># add to end</span>
+pts.<span class="fn">insert</span>(<span class="nm">0</span>, [<span class="nm">-1</span>,<span class="nm">0</span>,<span class="nm">0</span>]) <span class="cm"># insert at index</span>
+pts.<span class="fn">remove</span>([<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>])    <span class="cm"># remove value</span>
+pts.<span class="fn">pop</span>(<span class="nm">2</span>)              <span class="cm"># remove by index</span>
+pts.<span class="fn">sort</span>()              <span class="cm"># sort in-place</span>
+pts.<span class="fn">reverse</span>()          <span class="cm"># reverse</span>
+<span class="bi">len</span>(pts)                <span class="cm"># count</span>
+
+<span class="cm"># List comprehension</span>
+zs = [pt[<span class="nm">2</span>] <span class="kw">for</span> pt <span class="kw">in</span> pts]
+hi = [pt <span class="kw">for</span> pt <span class="kw">in</span> pts <span class="kw">if</span> pt[<span class="nm">2</span>] <span class="op">&gt;</span> <span class="nm">5</span>]</pre>
+    </div>
+  </div>
+
+  <!-- TUPLES & DICTS -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-o"></span> Tuples & Dictionaries</div>
+    <div class="card-body">
+<pre><span class="cm"># Tuple — immutable</span>
+t = (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>)
+t[<span class="nm">0</span>]              <span class="cm"># → 1</span>
+a, b, c = t       <span class="cm"># unpack</span>
+color = (<span class="nm">255</span>, <span class="nm">0</span>, <span class="nm">0</span>)  <span class="cm"># RGB tuple</span>
+
+<span class="cm"># Dictionary — key:value</span>
+mat = {
+    <span class="st">"name"</span>:    <span class="st">"concrete"</span>,
+    <span class="st">"density"</span>: <span class="nm">2400</span>,
+    <span class="st">"color"</span>:   (<span class="nm">180</span>,<span class="nm">180</span>,<span class="nm">180</span>)
+}
+mat[<span class="st">"name"</span>]           <span class="cm"># → "concrete"</span>
+mat[<span class="st">"E"</span>] = <span class="nm">30e9</span>        <span class="cm"># add key</span>
+<span class="st">"density"</span> <span class="kw">in</span> mat       <span class="cm"># → True</span>
+mat.<span class="fn">get</span>(<span class="st">"E"</span>, <span class="nm">0</span>)         <span class="cm"># safe get</span>
+
+<span class="kw">for</span> k, v <span class="kw">in</span> mat.<span class="fn">items</span>():
+    <span class="bi">print</span>(<span class="st">f"</span>{k}<span class="st">: </span>{v}<span class="st">"</span>)</pre>
+    </div>
+  </div>
+
+  <!-- FUNCTIONS -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-a"></span> Functions</div>
+    <div class="card-body">
+<pre><span class="cm"># Define</span>
+<span class="kw">def</span> <span class="fn">make_tower</span>(base_pt, height, count):
+    <span class="st">"""Creates stacked circles."""</span>
+    step = height / count
+    floors = []
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(count):
+        z   = base_pt[<span class="nm">2</span>] + i * step
+        ctr = [base_pt[<span class="nm">0</span>], base_pt[<span class="nm">1</span>], z]
+        rad = <span class="nm">5</span> <span class="op">-</span> i * (<span class="nm">5</span> / count)
+        floors.<span class="fn">append</span>(rs.<span class="fn">AddCircle</span>(ctr, rad))
+    <span class="kw">return</span> floors
+
+<span class="cm"># Default arguments</span>
+<span class="kw">def</span> <span class="fn">add_grid</span>(rows=<span class="nm">5</span>, cols=<span class="nm">5</span>, spacing=<span class="nm">2.0</span>):
+    pts = []
+    <span class="kw">for</span> r <span class="kw">in</span> <span class="bi">range</span>(rows):
+        <span class="kw">for</span> c <span class="kw">in</span> <span class="bi">range</span>(cols):
+            pts.<span class="fn">append</span>([c*spacing, r*spacing, <span class="nm">0</span>])
+    <span class="kw">return</span> pts
+
+<span class="cm"># Call</span>
+grid = <span class="fn">add_grid</span>(cols=<span class="nm">10</span>)</pre>
+    </div>
+  </div>
+
+  <!-- BRACKETS -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-v"></span> Brackets — When to Use</div>
+    <div class="card-body">
+      <table class="mini-table">
+        <tr><th>Bracket</th><th>Use</th><th>Example</th></tr>
+        <tr><td>( )</td><td>Call / Math / Tuple</td><td>rs.AddLine(p1, p2)</td></tr>
+        <tr><td>[ ]</td><td>List / Index / Slice</td><td>pts[0] / [x,y,z]</td></tr>
+        <tr><td>{ }</td><td>Dict / Set</td><td>{"key": val}</td></tr>
+        <tr><td>f"{ }"</td><td>f-string embed</td><td>f"val={x:.2f}"</td></tr>
+      </table>
+<pre style="margin-top:8px">
+<span class="cm"># ( ) — function call</span>
+result = rs.<span class="fn">CurveLength</span>(crv_id)
+
+<span class="cm"># [ ] — list literal + index</span>
+pt = [<span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>]
+z  = pt[<span class="nm">2</span>]
+
+<span class="cm"># { } — dictionary</span>
+d = {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>}
+
+<span class="cm"># f"{ }" — formatted string</span>
+msg = <span class="st">f"Length = </span>{result:.3f}<span class="st"> mm"</span></pre>
+    </div>
+  </div>
+
+  <!-- RHINO CREATION -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-c"></span> Rhino — Create Geometry</div>
+    <div class="card-body">
+<pre><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+
+<span class="cm"># Points</span>
+rs.<span class="fn">AddPoint</span>([x, y, z])
+rs.<span class="fn">AddPoints</span>(list_of_pts)
+
+<span class="cm"># Curves</span>
+rs.<span class="fn">AddLine</span>(pt_start, pt_end)
+rs.<span class="fn">AddPolyline</span>(pts)
+rs.<span class="fn">AddCurve</span>(pts, degree=<span class="nm">3</span>)
+rs.<span class="fn">AddInterpCurve</span>(pts, degree=<span class="nm">3</span>)
+rs.<span class="fn">AddCircle</span>(center, radius)
+rs.<span class="fn">AddArc</span>(plane, radius, degrees)
+rs.<span class="fn">AddEllipse</span>(plane, r_x, r_y)
+
+<span class="cm"># Surfaces</span>
+rs.<span class="fn">AddSphere</span>(center, radius)
+rs.<span class="fn">AddPlaneSurface</span>(plane, uv, uv)
+rs.<span class="fn">AddLoftSrf</span>([crv1, crv2, ...])
+rs.<span class="fn">AddNurbsSurface</span>(size, pts, ...)
+
+<span class="cm"># Mesh</span>
+rs.<span class="fn">AddMesh</span>(vertices, face_indices)</pre>
+    </div>
+  </div>
+
+  <!-- RHINO QUERY -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-c"></span> Rhino — Query & Measure</div>
+    <div class="card-body">
+<pre><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+
+<span class="cm"># Curves</span>
+rs.<span class="fn">CurveLength</span>(id)
+rs.<span class="fn">CurveDomain</span>(id)         <span class="cm"># [t0, t1]</span>
+rs.<span class="fn">CurveStartPoint</span>(id)
+rs.<span class="fn">CurveEndPoint</span>(id)
+rs.<span class="fn">CurveTangent</span>(id, t)
+rs.<span class="fn">EvaluateCurve</span>(id, t)    <span class="cm"># → point</span>
+rs.<span class="fn">DivideCurve</span>(id, N)      <span class="cm"># N pts</span>
+rs.<span class="fn">DivideCurveLength</span>(id, d) <span class="cm"># by dist</span>
+
+<span class="cm"># Surfaces</span>
+rs.<span class="fn">SurfaceDomain</span>(id, 0)    <span class="cm"># U domain</span>
+rs.<span class="fn">EvaluateSurface</span>(id,u,v) <span class="cm"># → point</span>
+rs.<span class="fn">SurfaceNormal</span>(id,[u,v]) <span class="cm"># → vector</span>
+rs.<span class="fn">SurfaceFrame</span>(id,[u,v])  <span class="cm"># → plane</span>
+rs.<span class="fn">SurfaceClosestPoint</span>(id,pt) <span class="cm"># → [u,v]</span>
+
+<span class="cm"># General</span>
+rs.<span class="fn">Distance</span>(pt1, pt2)
+rs.<span class="fn">BrepClosestPoint</span>(id, pt)</pre>
+    </div>
+  </div>
+
+  <!-- VECTOR MATH -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-g"></span> Vector Math</div>
+    <div class="card-body">
+<pre><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+
+a = [<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>]   b = [<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">0</span>]
+
+rs.<span class="fn">VectorAdd</span>(a, b)          <span class="cm"># [1,1,0]</span>
+rs.<span class="fn">VectorSubtract</span>(a, b)     <span class="cm"># [1,-1,0]</span>
+rs.<span class="fn">VectorScale</span>(a, <span class="nm">5</span>)        <span class="cm"># [5,0,0]</span>
+rs.<span class="fn">VectorUnitize</span>(a)         <span class="cm"># unit vector</span>
+rs.<span class="fn">VectorLength</span>(a)          <span class="cm"># magnitude</span>
+rs.<span class="fn">VectorCrossProduct</span>(a,b)  <span class="cm"># [0,0,1]</span>
+rs.<span class="fn">VectorDotProduct</span>(a,b)    <span class="cm"># 0.0</span>
+rs.<span class="fn">VectorRotate</span>(a,<span class="nm">90</span>,[<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">1</span>]) <span class="cm"># rotate</span>
+rs.<span class="fn">VectorCreate</span>(pt1, pt2)   <span class="cm"># pt2-pt1</span>
+rs.<span class="fn">IsVectorParallelTo</span>(a,b)  <span class="cm"># 1/-1/0</span>
+
+<span class="cm"># Point arithmetic</span>
+rs.<span class="fn">PointAdd</span>(pt, vec)
+rs.<span class="fn">PointSubtract</span>(pt, vec)</pre>
+    </div>
+  </div>
+
+  <!-- SELECTION & INTERACTION -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-v"></span> Selection & User Input</div>
+    <div class="card-body">
+<pre><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+
+<span class="cm"># Pick objects</span>
+obj  = rs.<span class="fn">GetObject</span>(<span class="st">"msg"</span>, rs.filter.curve)
+objs = rs.<span class="fn">GetObjects</span>(<span class="st">"msg"</span>, rs.filter.surface)
+srf, uv, pt = rs.<span class="fn">GetSurfaceObject</span>(<span class="st">"msg"</span>)
+
+<span class="cm"># Pick point / number / string</span>
+pt  = rs.<span class="fn">GetPoint</span>(<span class="st">"Pick point"</span>)
+n   = rs.<span class="fn">GetNumber</span>(<span class="st">"Value"</span>, <span class="nm">1.0</span>)
+k   = rs.<span class="fn">GetInteger</span>(<span class="st">"Count"</span>, <span class="nm">5</span>)
+s   = rs.<span class="fn">GetString</span>(<span class="st">"Name"</span>)
+
+<span class="cm"># Dialogs</span>
+rs.<span class="fn">MessageBox</span>(<span class="st">"Done!"</span>)
+choice = rs.<span class="fn">ListBox</span>(items, <span class="st">"title"</span>)
+color  = rs.<span class="fn">GetColor</span>()
+
+<span class="cm"># Filter constants</span>
+rs.filter.curve      <span class="cm"># 4</span>
+rs.filter.surface    <span class="cm"># 8</span>
+rs.filter.mesh       <span class="cm"># 32</span>
+rs.filter.point      <span class="cm"># 1</span></pre>
+    </div>
+  </div>
+
+  <!-- OBJECT ATTRIBUTES -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-o"></span> Object Attributes</div>
+    <div class="card-body">
+<pre><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+
+<span class="cm"># Name / Layer / Color</span>
+rs.<span class="fn">ObjectName</span>(id, <span class="st">"ColumnA1"</span>)
+rs.<span class="fn">ObjectLayer</span>(id, <span class="st">"Structure"</span>)
+rs.<span class="fn">ObjectColor</span>(id, (<span class="nm">255</span>,<span class="nm">0</span>,<span class="nm">0</span>))   <span class="cm"># RGB</span>
+
+<span class="cm"># Layers</span>
+rs.<span class="fn">AddLayer</span>(<span class="st">"Structure::Beams"</span>)  <span class="cm"># nested</span>
+rs.<span class="fn">LayerColor</span>(<span class="st">"Beams"</span>, (<span class="nm">0</span>,<span class="nm">100</span>,<span class="nm">255</span>))
+
+<span class="cm"># Delete / select</span>
+rs.<span class="fn">DeleteObject</span>(id)
+rs.<span class="fn">DeleteObjects</span>(id_list)
+rs.<span class="fn">SelectObject</span>(id)
+rs.<span class="fn">ObjectsByType</span>(rs.filter.curve)
+
+<span class="cm"># Type checks</span>
+rs.<span class="fn">IsCurve</span>(id)
+rs.<span class="fn">IsCurveClosed</span>(id)
+rs.<span class="fn">IsBlock</span>(id)</pre>
+    </div>
+  </div>
+
+  <!-- PERFORMANCE -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-a"></span> Performance Patterns</div>
+    <div class="card-body">
+<pre><span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+
+<span class="cm"># ✅ Always disable redraw for batch ops</span>
+rs.<span class="fn">EnableRedraw</span>(<span class="kw">False</span>)
+results = []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nm">500</span>):
+    results.<span class="fn">append</span>(rs.<span class="fn">AddPoint</span>([i,<span class="nm">0</span>,<span class="nm">0</span>]))
+rs.<span class="fn">EnableRedraw</span>(<span class="kw">True</span>)
+rs.<span class="fn">ZoomExtents</span>()
+
+<span class="cm"># ✅ Batch delete</span>
+rs.<span class="fn">DeleteObjects</span>(list_of_ids)   <span class="cm"># fast</span>
+<span class="cm"># ❌ not: for id in list: rs.DeleteObject(id)</span>
+
+<span class="cm"># ✅ Tolerance-aware checks</span>
+tol = rs.<span class="fn">UnitAbsoluteTolerance</span>()
+<span class="kw">if</span> length <span class="op">&lt;</span> tol: <span class="bi">print</span>(<span class="st">"zero-length"</span>)
+
+<span class="cm"># ✅ Always check None returns</span>
+crv = rs.<span class="fn">GetObject</span>(<span class="st">"Pick"</span>)
+<span class="kw">if</span> crv <span class="kw">is None</span>: exit()   <span class="cm"># user hit Esc</span></pre>
+    </div>
+  </div>
+
+  <!-- GRASSHOPPER -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-s"></span> Grasshopper Python (GHPython)</div>
+    <div class="card-body">
+<pre><span class="cm"># Standard GHPython header</span>
+<span class="kw">import</span> rhinoscriptsyntax <span class="kw">as</span> rs
+<span class="kw">import</span> Rhino.Geometry <span class="kw">as</span> rg
+<span class="kw">import</span> System.Drawing <span class="kw">as</span> sd
+
+<span class="cm"># Inputs: x, y (from GH wires)</span>
+<span class="cm"># Outputs: a, b, c (assigned to GH params)</span>
+
+<span class="cm"># Point grid output</span>
+pts = []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(rows):
+    <span class="kw">for</span> j <span class="kw">in</span> <span class="bi">range</span>(cols):
+        pts.<span class="fn">append</span>(rg.<span class="fn">Point3d</span>(i,j,<span class="nm">0</span>))
+a = pts    <span class="cm"># output list</span>
+
+<span class="cm"># Color by value</span>
+<span class="kw">if</span> length <span class="op">&lt;</span> threshold:
+    col = sd.Color.<span class="fn">FromArgb</span>(<span class="nm">30</span>,<span class="nm">100</span>,<span class="nm">255</span>)
+<span class="kw">else</span>:
+    col = sd.Color.<span class="fn">FromArgb</span>(<span class="nm">255</span>,<span class="nm">80</span>,<span class="nm">30</span>)
+b = col    <span class="cm"># → GH Custom Preview</span>
+
+<span class="cm"># rg vs rs</span>
+<span class="cm"># rg = geometry objects only (no document)</span>
+<span class="cm"># rs = document commands (adds to Rhino)</span></pre>
+    </div>
+  </div>
+
+  <!-- COMMON ERRORS -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-v"></span> Common Errors & Fixes</div>
+    <div class="card-body">
+      <table class="mini-table">
+        <tr><th>Error</th><th>Fix</th></tr>
+        <tr><td>IndentationError</td><td>Use 4 spaces, no tabs</td></tr>
+        <tr><td>NameError</td><td>Variable not defined yet</td></tr>
+        <tr><td>TypeError: NoneType</td><td>Check if obj is None first</td></tr>
+        <tr><td>IndexError</td><td>list index out of range → check len()</td></tr>
+        <tr><td>AttributeError</td><td>Wrong type, check isinstance()</td></tr>
+        <tr><td>Script too slow</td><td>EnableRedraw(False) in loop</td></tr>
+      </table>
+<pre style="margin-top:8px">
+<span class="cm"># Safe pattern</span>
+obj = rs.<span class="fn">GetObject</span>(<span class="st">"Select"</span>)
+<span class="kw">if</span> obj <span class="kw">is None</span>:
+    <span class="bi">print</span>(<span class="st">"Cancelled"</span>)
+<span class="kw">else</span>:
+    <span class="cm"># safe to use obj here</span>
+    length = rs.<span class="fn">CurveLength</span>(obj)</pre>
+    </div>
+  </div>
+
+  <!-- MATH QUICK REF -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-p"></span> Math Quick Reference</div>
+    <div class="card-body">
+<pre><span class="kw">import</span> math
+
+math.<span class="fn">pi</span>                <span class="cm"># 3.14159…</span>
+math.<span class="fn">e</span>                 <span class="cm"># 2.71828…</span>
+math.<span class="fn">sqrt</span>(<span class="nm">16</span>)          <span class="cm"># 4.0</span>
+math.<span class="fn">pow</span>(<span class="nm">2</span>, <span class="nm">10</span>)         <span class="cm"># 1024.0</span>
+math.<span class="fn">sin</span>(math.pi/<span class="nm">2</span>)    <span class="cm"># 1.0</span>
+math.<span class="fn">cos</span>(<span class="nm">0</span>)             <span class="cm"># 1.0</span>
+math.<span class="fn">tan</span>(math.pi/<span class="nm">4</span>)    <span class="cm"># 1.0</span>
+math.<span class="fn">atan2</span>(y, x)        <span class="cm"># angle in rad</span>
+math.<span class="fn">degrees</span>(rad)       <span class="cm"># rad → deg</span>
+math.<span class="fn">radians</span>(deg)       <span class="cm"># deg → rad</span>
+math.<span class="fn">floor</span>(<span class="nm">3.9</span>)         <span class="cm"># 3</span>
+math.<span class="fn">ceil</span>(<span class="nm">3.1</span>)          <span class="cm"># 4</span>
+math.<span class="fn">fabs</span>(-<span class="nm">5</span>)           <span class="cm"># 5.0  (abs)</span>
+<span class="bi">round</span>(<span class="nm">3.14159</span>, <span class="nm">2</span>)      <span class="cm"># 3.14</span>
+<span class="bi">min</span>(<span class="nm">3</span>,<span class="nm">1</span>,<span class="nm">4</span>)   <span class="bi">max</span>(<span class="nm">3</span>,<span class="nm">1</span>,<span class="nm">4</span>)  <span class="cm"># 1, 4</span></pre>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+<div class="grid">
+
+  <!-- STRINGS -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-u"></span> String Methods</div>
+    <div class="card-body">
+<pre>s = <span class="st">"  Hello Rhino  "</span>
+s.<span class="fn">strip</span>()         <span class="cm"># "Hello Rhino"</span>
+s.<span class="fn">upper</span>()         <span class="cm"># "  HELLO RHINO  "</span>
+s.<span class="fn">lower</span>()         <span class="cm"># "  hello rhino  "</span>
+s.<span class="fn">replace</span>(<span class="st">"Rhino"</span>,<span class="st">"GH"</span>)
+s.<span class="fn">split</span>(<span class="st">" "</span>)       <span class="cm"># list of words</span>
+<span class="st">" | "</span>.<span class="fn">join</span>([<span class="st">"a"</span>,<span class="st">"b"</span>])  <span class="cm"># "a | b"</span>
+s.<span class="fn">find</span>(<span class="st">"Rhino"</span>)   <span class="cm"># index or -1</span>
+s.<span class="fn">startswith</span>(<span class="st">"H"</span>) <span class="cm"># True/False</span>
+s.<span class="fn">endswith</span>(<span class="st">"o"</span>)   <span class="cm"># True/False</span>
+s.<span class="fn">count</span>(<span class="st">"o"</span>)      <span class="cm"># occurrences</span>
+<span class="st">"42"</span>.<span class="fn">zfill</span>(<span class="nm">5</span>)     <span class="cm"># "00042"</span></pre>
+    </div>
+  </div>
+
+  <!-- F-STRINGS -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-u"></span> f-strings &amp; Format</div>
+    <div class="card-body">
+<pre>n = <span class="nm">3.14159</span>   i = <span class="nm">42</span>
+<span class="st">f"Value: </span>{n:.2f}<span class="st">"</span>      <span class="cm"># "Value: 3.14"</span>
+<span class="st">f"</span>{n:8.2f}<span class="st">"</span>           <span class="cm"># "    3.14" (width 8)</span>
+<span class="st">f"</span>{i:04d}<span class="st">"</span>            <span class="cm"># "0042"</span>
+<span class="st">f"</span>{i:b}<span class="st">"</span>              <span class="cm"># "101010" (binary)</span>
+<span class="st">f"</span>{n:e}<span class="st">"</span>              <span class="cm"># "3.14e+00" (sci)</span>
+<span class="st">f"</span>{<span class="nm">2</span><span class="op">**</span><span class="nm">10</span>}<span class="st">"</span>            <span class="cm"># "1024" (expr)</span>
+<span class="cm"># String slice</span>
+s = <span class="st">"Rhinoceros"</span>
+s[:<span class="nm">5</span>]   <span class="cm"># "Rhino"</span>
+s[-<span class="nm">1</span>]    <span class="cm"># "s"</span>
+s[::-<span class="nm">1</span>]  <span class="cm"># reversed</span></pre>
+    </div>
+  </div>
+
+  <!-- TRY / EXCEPT -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-v"></span> try / except / finally</div>
+    <div class="card-body">
+<pre><span class="kw">try</span>:
+    val = <span class="bi">int</span>(user_input)
+    result = <span class="nm">100</span> / val
+<span class="kw">except</span> ValueError:
+    <span class="bi">print</span>(<span class="st">"Not a number!"</span>)
+<span class="kw">except</span> ZeroDivisionError:
+    result = <span class="nm">0</span>
+<span class="kw">except</span> <span class="bi">Exception</span> <span class="kw">as</span> e:
+    <span class="bi">print</span>(<span class="st">f"Error: </span>{e}<span class="st">"</span>)  <span class="cm"># catch-all</span>
+<span class="kw">else</span>:
+    <span class="bi">print</span>(<span class="st">"No errors!"</span>)   <span class="cm"># only if no exception</span>
+<span class="kw">finally</span>:
+    file.<span class="fn">close</span>()        <span class="cm"># always runs</span>
+
+<span class="cm"># Raise your own</span>
+<span class="kw">raise</span> ValueError(<span class="st">"Bad input"</span>)</pre>
+    </div>
+  </div>
+
+  <!-- FILE I/O -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-p"></span> File I/O</div>
+    <div class="card-body">
+<pre><span class="cm"># Write</span>
+<span class="kw">with</span> <span class="bi">open</span>(<span class="st">"data.txt"</span>, <span class="st">"w"</span>) <span class="kw">as</span> f:
+    f.<span class="fn">write</span>(<span class="st">"Hello\n"</span>)
+
+<span class="cm"># Read all at once</span>
+<span class="kw">with</span> <span class="bi">open</span>(<span class="st">"data.txt"</span>, <span class="st">"r"</span>) <span class="kw">as</span> f:
+    text = f.<span class="fn">read</span>()         <span class="cm"># string</span>
+    lines = f.<span class="fn">readlines</span>()   <span class="cm"># list of lines</span>
+
+<span class="cm"># JSON</span>
+<span class="kw">import</span> json
+<span class="kw">with</span> <span class="bi">open</span>(<span class="st">"d.json"</span>,<span class="st">"w"</span>) <span class="kw">as</span> f:
+    json.<span class="fn">dump</span>(data, f, indent=<span class="nm">2</span>)
+<span class="kw">with</span> <span class="bi">open</span>(<span class="st">"d.json"</span>,<span class="st">"r"</span>) <span class="kw">as</span> f:
+    data = json.<span class="fn">load</span>(f)
+
+<span class="cm"># Safe load (try/except)</span>
+<span class="kw">try</span>:
+    <span class="kw">with</span> <span class="bi">open</span>(<span class="st">"cfg.txt"</span>) <span class="kw">as</span> f:
+        cfg = f.<span class="fn">read</span>()
+<span class="kw">except</span> FileNotFoundError:
+    cfg = <span class="st">""</span>   <span class="cm"># default</span></pre>
+    </div>
+  </div>
+
+  <!-- LAMBDA -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-a"></span> lambda / map / filter / sorted</div>
+    <div class="card-body">
+<pre><span class="cm"># lambda: inline one-liner function</span>
+sq = <span class="kw">lambda</span> x: x<span class="op">**</span><span class="nm">2</span>     <span class="cm"># sq(5) → 25</span>
+mid = <span class="kw">lambda</span> a,b: (a+b)/<span class="nm">2</span> <span class="cm"># midpoint</span>
+
+<span class="cm"># sorted with key</span>
+curves_by_len = <span class="bi">sorted</span>(
+    curves, key=<span class="kw">lambda</span> c: rs.<span class="fn">CurveLength</span>(c))
+
+longest = <span class="bi">max</span>(curves, key=<span class="kw">lambda</span> c: rs.<span class="fn">CurveLength</span>(c))
+
+<span class="cm"># filter — keep matching items</span>
+long = <span class="bi">list</span>(<span class="bi">filter</span>(
+    <span class="kw">lambda</span> c: rs.<span class="fn">CurveLength</span>(c) &gt; <span class="nm">5</span>, curves))
+
+<span class="cm"># map — transform all items</span>
+lengths = <span class="bi">list</span>(<span class="bi">map</span>(rs.<span class="fn">CurveLength</span>, curves))
+
+<span class="cm"># Equivalent list comprehensions</span>
+long    = [c <span class="kw">for</span> c <span class="kw">in</span> curves <span class="kw">if</span> rs.<span class="fn">CurveLength</span>(c)&gt;<span class="nm">5</span>]
+lengths = [rs.<span class="fn">CurveLength</span>(c) <span class="kw">for</span> c <span class="kw">in</span> curves]</pre>
+    </div>
+  </div>
+
+  <!-- *args **kwargs -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-a"></span> *args and **kwargs</div>
+    <div class="card-body">
+<pre><span class="cm"># *args — any number of positional args</span>
+<span class="kw">def</span> <span class="fn">add_pts</span>(<span class="op">*</span>points):
+    <span class="kw">for</span> pt <span class="kw">in</span> points:
+        rs.<span class="fn">AddPoint</span>(pt)
+
+<span class="fn">add_pts</span>([<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>], [<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>], [<span class="nm">2</span>,<span class="nm">0</span>,<span class="nm">0</span>])
+
+<span class="cm"># **kwargs — keyword arguments as dict</span>
+<span class="kw">def</span> <span class="fn">tag</span>(obj, <span class="op">**</span>attrs):
+    <span class="kw">if</span> <span class="st">"name"</span>  <span class="kw">in</span> attrs: rs.<span class="fn">ObjectName</span>(obj, attrs[<span class="st">"name"</span>])
+    <span class="kw">if</span> <span class="st">"color"</span> <span class="kw">in</span> attrs: rs.<span class="fn">ObjectColor</span>(obj, attrs[<span class="st">"color"</span>])
+
+<span class="fn">tag</span>(obj, name=<span class="st">"Beam_1"</span>, color=(<span class="nm">255</span>,<span class="nm">0</span>,<span class="nm">0</span>))
+
+<span class="cm"># Unpack list/dict into call</span>
+coords = [<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>]
+rs.<span class="fn">AddPoint</span>(<span class="op">*</span>coords)    <span class="cm"># splat list</span>
+<span class="fn">tag</span>(obj, <span class="op">**</span>my_dict)     <span class="cm"># splat dict</span></pre>
+    </div>
+  </div>
+
+  <!-- GENERATORS -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-g"></span> Generators &amp; yield</div>
+    <div class="card-body">
+<pre><span class="cm"># Generator — lazy, memory-efficient</span>
+<span class="kw">def</span> <span class="fn">grid_pts</span>(rows, cols, sp):
+    <span class="kw">for</span> r <span class="kw">in</span> <span class="bi">range</span>(rows):
+        <span class="kw">for</span> c <span class="kw">in</span> <span class="bi">range</span>(cols):
+            <span class="kw">yield</span> [c<span class="op">*</span>sp, r<span class="op">*</span>sp, <span class="nm">0</span>]
+
+<span class="kw">for</span> pt <span class="kw">in</span> <span class="fn">grid_pts</span>(<span class="nm">10</span>,<span class="nm">10</span>,<span class="nm">2</span>):
+    rs.<span class="fn">AddPoint</span>(pt)  <span class="cm"># one at a time</span>
+
+<span class="cm"># Generator expression  ( ) not [ ]</span>
+total = <span class="bi">sum</span>(rs.<span class="fn">CurveLength</span>(c) <span class="kw">for</span> c <span class="kw">in</span> curves)
+minL  = <span class="bi">min</span>(rs.<span class="fn">CurveLength</span>(c) <span class="kw">for</span> c <span class="kw">in</span> curves)
+
+<span class="cm"># any / all</span>
+<span class="bi">any</span>(rs.<span class="fn">IsCurveClosed</span>(c) <span class="kw">for</span> c <span class="kw">in</span> curves)
+<span class="bi">all</span>(rs.<span class="fn">IsCurve</span>(c)       <span class="kw">for</span> c <span class="kw">in</span> curves)</pre>
+    </div>
+  </div>
+
+  <!-- RhinoCommon rg. -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-c"></span> RhinoCommon (rg.)</div>
+    <div class="card-body">
+<pre><span class="kw">import</span> Rhino.Geometry <span class="kw">as</span> rg
+
+<span class="cm"># Points &amp; Vectors</span>
+p = rg.<span class="fn">Point3d</span>(<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">0</span>)
+v = rg.<span class="fn">Vector3d</span>(<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>)
+rg.Vector3d.<span class="fn">XAxis</span>   <span class="cm"># (1,0,0)</span>
+rg.Vector3d.<span class="fn">CrossProduct</span>(v1,v2)
+p.<span class="fn">DistanceTo</span>(p2)
+
+<span class="cm"># Plane</span>
+rg.Plane.<span class="fn">WorldXY</span>   <span class="cm"># standard XY</span>
+rg.<span class="fn">Plane</span>(origin, normal)
+
+<span class="cm"># NurbsCurve</span>
+nc = rg.NurbsCurve.<span class="fn">CreateFromPoints</span>(pts, <span class="nm">3</span>)
+nc.<span class="fn">GetLength</span>()
+nc.<span class="fn">PointAt</span>(t)
+nc.<span class="fn">TangentAt</span>(t)
+
+<span class="cm"># Transforms</span>
+xf = rg.Transform.<span class="fn">Translation</span>(<span class="nm">5</span>,<span class="nm">0</span>,<span class="nm">0</span>)
+xf = rg.Transform.<span class="fn">Rotation</span>(angle, axis, pt)
+pt.<span class="fn">Transform</span>(xf)
+
+<span class="cm"># Brep booleans</span>
+rg.Brep.<span class="fn">CreateBooleanUnion</span>(breps, tol)</pre>
+    </div>
+  </div>
+
+  <!-- PARAMETRIC PATTERNS -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-s"></span> Parametric Design Patterns</div>
+    <div class="card-body">
+<pre><span class="cm"># Normalize: map 0→n to 0→1</span>
+t = i / (n - <span class="nm">1</span>)           <span class="cm"># t ∈ [0,1]</span>
+
+<span class="cm"># Linear interpolation (lerp)</span>
+val = a + (b - a) * t      <span class="cm"># between a and b</span>
+
+<span class="cm"># Remap from [src0,src1] to [dst0,dst1]</span>
+t = (v - src0) / (src1 - src0)
+out = dst0 + t * (dst1 - dst0)
+
+<span class="cm"># Attractor influence (inverse distance)</span>
+d = rs.<span class="fn">Distance</span>(pt, attractor)
+scale = <span class="nm">1</span> / (d + <span class="nm">0.001</span>)   <span class="cm"># avoid /0</span>
+
+<span class="cm"># Grid to flat index</span>
+idx = row * cols + col
+
+<span class="cm"># Flat index to row/col</span>
+row = idx // cols
+col = idx  % cols
+
+<span class="cm"># Polar coordinates</span>
+x = r * math.<span class="fn">cos</span>(angle)
+y = r * math.<span class="fn">sin</span>(angle)</pre>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  RhinoPy Complete Learning Package · Created by <strong>Dinesh Kumar Alagusundaram</strong><br>
+  <a href="index.html">Home</a> · <a href="learn.html">Learn</a> · <a href="api.html">Full API</a> · <a href="LICENSE.md">📄 MIT License</a><br>
+  Sources: <em>Python Primer for Rhino</em> (Tibbits/McNeel 2011) · <em>RhinoScript101</em> (Rutten/McNeel 2008) · developer.rhino3d.com<br>
+  <strong style="color:#00d9ff">MIT License</strong> — Free to use · Free to share · Free to modify · Free for commercial use<br>
+  Created by Dinesh Kumar Alagusundaram · Keep this credit when redistributing · Rhino® and Grasshopper® are trademarks of Robert McNeel &amp; Associates.
+</footer>
+
+</body>
+</html>
